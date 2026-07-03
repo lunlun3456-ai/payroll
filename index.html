@@ -12,76 +12,67 @@
   }
   *{box-sizing:border-box;}
   body{ margin:0; background: var(--paper); color: var(--ink); font-family: "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; }
-  .app{ display:grid; grid-template-columns: 380px 1fr; min-height:100vh; }
+  .app{ display:grid; grid-template-columns: 320px 1fr; min-height:100vh; }
 
-  .sidebar{ background: var(--ink); color: #eef2f5; padding: 26px 22px 40px; overflow-y:auto; }
+  /* ================= SIDEBAR (navigation only — no data entry) ================= */
+  .sidebar{ background: var(--ink); color: #ffffff; padding: 26px 20px 40px; overflow-y:auto; }
   .brand{ display:flex; align-items:baseline; gap:10px; margin-bottom: 4px; }
-  .brand-mark{ font-family:"Iowan Old Style","Georgia",serif; font-size:25px; font-weight:700; letter-spacing:.5px; color: var(--gold); }
-  .brand-sub{ font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:#9fb0bf; }
-  .tagline{ font-size:12px; color:#b9c6d1; margin: 5px 0 16px; line-height:1.5; }
+  .brand-mark{ font-family:"Iowan Old Style","Georgia",serif; font-size:24px; font-weight:700; letter-spacing:.5px; color: var(--gold); }
+  .brand-sub{ font-size:10.5px; letter-spacing:2.5px; text-transform:uppercase; color:#c9d4dc; }
+  .tagline{ font-size:12px; color:#dbe3e9; margin: 6px 0 16px; line-height:1.55; }
 
-  .conn-badge{ display:flex; align-items:center; gap:8px; font-size:11.5px; padding:9px 12px; border-radius:8px; margin-bottom:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); }
+  .conn-badge{ display:flex; align-items:center; gap:8px; font-size:11.5px; padding:9px 12px; border-radius:8px; margin-bottom:18px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); }
   .conn-badge .dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-  .conn-badge.ok .dot{ background:#4fae72; box-shadow:0 0 0 3px rgba(79,174,114,.18); }
-  .conn-badge.off .dot{ background:#6b7a86; }
-  .conn-badge.err .dot{ background:#c9583f; }
-  .conn-badge.ok{ color:#a9d9bc; }
-  .conn-badge.off{ color:#9fb0bf; }
-  .conn-badge.err{ color:#e6a596; }
-  .conn-badge button{ margin-left:auto; background:none; border:none; color:inherit; text-decoration:underline; font-size:11px; cursor:pointer; font-family:inherit; padding:0; opacity:.8; }
+  .conn-badge.ok .dot{ background:#5fcf8a; box-shadow:0 0 0 3px rgba(95,207,138,.2); }
+  .conn-badge.off .dot{ background:#9fb0bf; }
+  .conn-badge.err .dot{ background:#e3684b; }
+  .conn-badge.ok{ color:#c3f0d6; }
+  .conn-badge.off{ color:#d6dee4; }
+  .conn-badge.err{ color:#f3b6a4; }
+  .conn-badge button{ margin-left:auto; background:none; border:none; color:#fff; text-decoration:underline; font-size:11px; cursor:pointer; font-family:inherit; padding:0; opacity:.9; }
   .conn-badge button:hover{ opacity:1; }
 
-  fieldset{ border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:14px 15px 13px; margin: 0 0 14px; }
-  legend{ font-size:10.5px; text-transform:uppercase; letter-spacing:1.6px; color: var(--gold); padding:0 6px; font-weight:600; }
-  label{ display:block; font-size:11.5px; color:#c4cfd8; margin: 9px 0 4px; }
-  label.first{margin-top:0;}
-  input[type=text], input[type=number], input[type=url], select{
-    width:100%; padding:7px 9px; border-radius:6px; border:1px solid rgba(255,255,255,.18);
-    background: rgba(255,255,255,.06); color:#f3f6f8; font-size:13px; outline:none; font-family:inherit;
-  }
-  input::placeholder{color:#7d8b97;}
-  input:focus, select:focus{ border-color: var(--gold); background: rgba(255,255,255,.1); }
-  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
-  .row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
-  select{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23b9c6d1'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
+  .nav-section{ margin-bottom:20px; }
+  .nav-title{ font-size:10.5px; text-transform:uppercase; letter-spacing:1.6px; color: var(--gold); font-weight:700; margin-bottom:10px; }
 
-  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:10px 14px; border-radius:7px; border:none; font-size:13px; font-weight:600; letter-spacing:.3px; cursor:pointer; font-family:inherit; }
-  .btn:active{ transform: translateY(1px); }
-  .btn:disabled{ opacity:.4; cursor:not-allowed; }
-  .btn-gold{ background: linear-gradient(180deg,var(--gold),var(--gold-deep)); color:#1c1204; margin-top:6px;}
-  .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,.25); color:#eef2f5; }
-  .btn-amber{ background: rgba(184,134,60,.16); border:1px solid var(--gold); color:#f0d9b3; }
-  .btn-danger{ background:transparent; border:1px solid rgba(163,64,47,.5); color:#e9a898; }
-  .btn-sm{ padding:7px 10px; font-size:12px; width:auto; }
-
-  .co-list{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
-  .co-chip{ font-size:12px; padding:6px 11px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); cursor:pointer; display:flex; align-items:center; gap:6px; }
+  .co-chip-row{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .co-chip{ font-size:12.5px; padding:7px 12px; border-radius:14px; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.2); cursor:pointer; display:flex; align-items:center; gap:7px; color:#fff; }
   .co-chip:hover{ border-color:var(--gold); }
-  .co-chip.active{ background:rgba(184,134,60,.18); border-color:var(--gold); color:#f0d9b3; font-weight:600; }
-  .co-chip .x{ color:#e9a898; font-size:12px; }
-  .add-chip{ font-size:12px; padding:6px 11px; border-radius:14px; border:1px dashed rgba(255,255,255,.3); background:transparent; color:#dbe4ea; cursor:pointer; font-family:inherit; }
-  .add-chip:hover{ border-color:var(--gold); color:var(--gold); }
+  .co-chip.active{ background:rgba(184,134,60,.28); border-color:var(--gold); color:#fff; font-weight:700; }
+  .co-chip .x{ color:#f3b6a4; font-size:12px; }
+  .side-btn{ display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:9px; border-radius:8px; border:1px dashed rgba(255,255,255,.35); background:transparent; color:#fff; font-size:12.5px; cursor:pointer; font-family:inherit; font-weight:600; }
+  .side-btn:hover{ border-color: var(--gold); color:var(--gold); }
+  .side-btn.solid{ border-style:solid; background:rgba(184,134,60,.2); border-color:var(--gold); color:#f3dfb8; margin-top:8px; }
+  .side-btn.solid:hover{ background:rgba(184,134,60,.32); }
 
-  .staff-list{ margin-top:2px; max-height:190px; overflow-y:auto; }
-  .staff-item{ display:flex; justify-content:space-between; align-items:center; padding:9px 11px; border-radius:7px; margin-bottom:6px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); cursor:pointer; font-size:13px; }
-  .staff-item:hover{ background: rgba(255,255,255,.09); }
-  .staff-item.active{ border-color: var(--gold); background: rgba(184,134,60,.14); }
-  .staff-name{ font-weight:600; }
-  .staff-role{ font-size:10.5px; color:#9fb0bf; }
-  .staff-item .x{ color:#e9a898; font-size:15px; padding:2px 6px; }
-  .empty-note{ font-size:11.5px; color:#8a97a2; padding:6px 2px; }
-  .add-staff-btn{ display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:8px; margin-bottom:10px; border-radius:7px; border:1px dashed rgba(255,255,255,.3); background:transparent; color:#dbe4ea; font-size:12px; cursor:pointer; font-family:inherit; }
-  .add-staff-btn:hover{ border-color: var(--gold); color:var(--gold); }
+  .staff-list{ margin-top:2px; max-height:220px; overflow-y:auto; }
+  .staff-item{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:8px; margin-bottom:6px; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); cursor:pointer; font-size:13px; color:#fff; }
+  .staff-item:hover{ background: rgba(255,255,255,.13); }
+  .staff-item.active{ border-color: var(--gold); background: rgba(184,134,60,.28); }
+  .staff-name{ font-weight:700; }
+  .staff-role{ font-size:11px; color:#dbe3e9; margin-top:1px; }
+  .staff-item .x{ color:#f3b6a4; font-size:15px; padding:2px 6px; }
+  .empty-note{ font-size:12px; color:#c9d4dc; padding:6px 2px; line-height:1.5; }
 
-  .history-chip{ display:inline-flex; align-items:center; gap:6px; font-size:11px; padding:5px 9px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); margin:0 5px 5px 0; cursor:pointer; }
+  .period-row{ display:grid; grid-template-columns:1.3fr 1fr; gap:8px; margin-bottom:10px; }
+  select, input.side-input{
+    width:100%; padding:8px 9px; border-radius:6px; border:1px solid rgba(255,255,255,.28);
+    background: rgba(255,255,255,.1); color:#ffffff; font-size:13px; outline:none; font-family:inherit;
+  }
+  select{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23ffffff'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
+  select option{ color:#111; }
+  select:focus, input.side-input:focus{ border-color: var(--gold); background: rgba(255,255,255,.16); }
+
+  .history-chip{ display:inline-flex; align-items:center; gap:6px; font-size:11.5px; padding:5px 10px; border-radius:14px; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.2); margin:0 5px 5px 0; cursor:pointer; color:#fff; }
   .history-chip:hover{ border-color:var(--gold); color:var(--gold); }
-  .history-chip.current{ border-color:var(--gold); background:rgba(184,134,60,.16); }
+  .history-chip.current{ border-color:var(--gold); background:rgba(184,134,60,.28); }
 
-  .ref-links{ font-size:10.5px; line-height:1.9; margin-top:4px; color:#aebac3; }
-  .ref-links a{ color:#9fc7dd; text-decoration:none; }
+  .ref-links{ font-size:11px; line-height:1.9; margin-top:2px; color:#dbe3e9; }
+  .ref-links a{ color:#bfe0f2; text-decoration:none; font-weight:600; }
   .ref-links a:hover{ text-decoration:underline; }
 
-  .main{ padding: 30px 40px 60px; display:flex; flex-direction:column; align-items:center; }
+  /* ================= MAIN (all data entry happens here, full width) ================= */
+  .main{ padding: 30px 44px 60px; display:flex; flex-direction:column; align-items:center; }
   .toolbar{ width:100%; max-width:800px; display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
   .toolbar h1{ font-family:"Iowan Old Style","Georgia",serif; font-size:19px; margin:0; color:var(--ink); }
   .toolbar .sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
@@ -89,6 +80,30 @@
   .btn-outline{ background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:9px 15px; border-radius:7px; font-size:12.5px; cursor:pointer; font-family:inherit; }
   .btn-outline:hover{ border-color:var(--gold); color:var(--gold-deep); }
   .btn-outline:disabled{ opacity:.4; cursor:not-allowed; }
+
+  /* ---- big open-screen form cards ---- */
+  .form-card{ width:100%; max-width:800px; background:var(--panel); border-radius:12px; box-shadow:var(--shadow); border-top:5px solid var(--gold); padding:36px 40px 32px; }
+  .form-card h2{ font-family:"Iowan Old Style","Georgia",serif; font-size:21px; margin:0 0 4px; }
+  .form-card .fc-sub{ font-size:13px; color:var(--ink-soft); margin-bottom:26px; }
+  .fc-label{ display:block; font-size:12px; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.5px; margin:0 0 6px; }
+  .fc-group{ margin-bottom:18px; }
+  .fc-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .fc-grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; }
+  .fc-input, .fc-select{
+    width:100%; padding:12px 14px; border-radius:8px; border:1.5px solid var(--line);
+    font-size:14px; font-family:inherit; color:var(--ink); background:#fff;
+  }
+  .fc-input:focus, .fc-select:focus{ outline:none; border-color:var(--gold); }
+  .fc-select{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%233a5068'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; }
+  .fc-section-title{ font-size:11.5px; text-transform:uppercase; letter-spacing:1.3px; color:var(--gold-deep); font-weight:700; margin:26px 0 14px; padding-top:18px; border-top:1px solid var(--line); }
+  .fc-section-title.first{ margin-top:0; padding-top:0; border-top:none; }
+  .fc-actions{ display:flex; gap:10px; margin-top:30px; }
+  .fc-btn{ padding:12px 22px; border-radius:8px; border:none; font-size:13.5px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .fc-btn.primary{ background:linear-gradient(180deg,var(--gold),var(--gold-deep)); color:#1c1204; }
+  .fc-btn.ghost{ background:transparent; border:1.5px solid var(--line); color:var(--ink-soft); }
+  .fc-btn.ghost:hover{ border-color:var(--ink-soft); color:var(--ink); }
+  .fc-btn.danger{ background:transparent; border:1.5px solid rgba(163,64,47,.4); color:var(--red); margin-left:auto; }
+  .fc-btn.danger:hover{ background:rgba(163,64,47,.06); }
 
   /* ---- payslip: bordered-box template style ---- */
   .payslip{ width:100%; max-width:800px; background:#fff; box-shadow: var(--shadow); border:2px solid #111; margin-bottom:20px; font-family: Arial, Helvetica, sans-serif; }
@@ -119,11 +134,14 @@
   .ps-sign div{ flex:1; }
   .ps-sign .line{ border-bottom:1px solid #111; margin-top:26px; }
   .ps-draft{ font-size:10px; color:var(--red); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+  .ps-edit-hint{ width:100%; max-width:800px; display:flex; justify-content:flex-end; margin:-10px 0 14px; }
+  .ps-edit-hint button{ background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:8px 14px; border-radius:7px; font-size:12.5px; cursor:pointer; font-family:inherit; }
+  .ps-edit-hint button:hover{ border-color:var(--gold); color:var(--gold-deep); }
 
   .placeholder{ width:100%; max-width:800px; background:var(--panel); border:1px dashed var(--line); border-radius:8px; padding:60px 30px; text-align:center; color:var(--ink-soft); }
   .placeholder h2{ font-family:"Iowan Old Style","Georgia",serif; color:var(--ink); margin-bottom:8px; }
 
-  /* ---- connection gate (first-run onboarding) ---- */
+  /* ---- connection gate ---- */
   .gate{ width:100%; max-width:560px; background:var(--panel); border-radius:12px; box-shadow:var(--shadow); border-top:5px solid var(--gold); padding:40px 40px 34px; }
   .gate h2{ font-family:"Iowan Old Style","Georgia",serif; font-size:22px; margin:0 0 6px; }
   .gate p{ font-size:13.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 22px; }
@@ -150,7 +168,7 @@
 
   @media print{
     body{ background:#fff; }
-    .sidebar, .toolbar, .toast{ display:none !important; }
+    .sidebar, .toolbar, .toast, .ps-edit-hint{ display:none !important; }
     .main{ padding:0; }
     .payslip{ box-shadow:none; max-width:100%; margin-bottom:0; }
     body:not(.batch-mode) .payslip.batch-only{ display:none !important; }
@@ -166,17 +184,18 @@
     .ps-cols, .ps-totals-row, .ps-employer-row{ grid-template-columns:1fr; }
     .ps-col.left, .ps-totals-cell.left, .ps-employer-cell{ border-right:none; border-bottom:2px solid #111; }
     .ps-sign{ flex-direction:column; }
-    .gate{ padding:28px 22px; }
+    .gate, .form-card{ padding:26px 20px; }
+    .fc-grid2, .fc-grid3{ grid-template-columns:1fr; gap:16px; }
   }
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- ============ SIDEBAR ============ -->
+  <!-- ============ SIDEBAR — navigation only ============ -->
   <div class="sidebar">
     <div class="brand"><span class="brand-mark">Gaji</span><span class="brand-sub">Payroll System MY</span></div>
-    <div class="tagline">Multi-company Malaysian payroll, synced live to your own Google Sheet. Staff records, monthly payslips, EPF/SOCSO/EIS calculated automatically.</div>
+    <div class="tagline">Synced live to your Google Sheet.</div>
 
     <div class="conn-badge off" id="connBadge">
       <span class="dot"></span>
@@ -184,112 +203,45 @@
       <button id="connManageBtn">Manage</button>
     </div>
 
-    <div id="appPanels" style="display:none;">
-      <fieldset>
-        <legend>Companies</legend>
-        <div class="co-list" id="coList"></div>
-        <button class="add-chip" id="addCompanyBtn">+ Add company</button>
-      </fieldset>
+    <div id="navPanels" style="display:none;">
+      <div class="nav-section">
+        <div class="nav-title">Companies</div>
+        <div class="co-chip-row" id="coList"></div>
+        <button class="side-btn" id="addCompanyBtn">+ Add new company</button>
+      </div>
 
-      <fieldset id="companyFieldset" style="display:none;">
-        <legend id="companyLegend">Company details</legend>
-        <label class="first">Company name</label>
-        <input type="text" id="companyName" placeholder="Sdn Bhd name">
-        <label>Address</label>
-        <input type="text" id="companyAddr" placeholder="Address, city, state">
-        <label>Employer EPF / SOCSO / EIS No.</label>
-        <input type="text" id="companyRefs" placeholder="e.g. E12345678 / S987654">
-        <button class="btn btn-ghost btn-sm" id="saveCompanyBtn" style="width:100%; margin-top:12px;">Save company</button>
-        <button class="btn btn-danger btn-sm" id="deleteCompanyBtn" style="width:100%; margin-top:8px;">Delete this company</button>
-      </fieldset>
-
-      <fieldset id="staffDirFieldset" style="display:none;">
-        <legend>Staff at this company</legend>
-        <button class="add-staff-btn" id="addStaffBtn">+ Add new staff</button>
+      <div class="nav-section" id="staffNavSection" style="display:none;">
+        <div class="nav-title">Staff</div>
         <div class="staff-list" id="staffList"></div>
-        <div class="empty-note" id="staffEmpty">No staff saved yet for this company.</div>
-      </fieldset>
+        <div class="empty-note" id="staffEmpty">No staff yet for this company.</div>
+        <button class="side-btn" id="addStaffBtn">+ Add new staff</button>
+        <button class="side-btn solid" id="editCompanyBtn">Edit company details</button>
+      </div>
 
-      <fieldset id="profileFieldset" style="display:none;">
-        <legend id="profileLegend">Staff profile</legend>
-        <label class="first">Full name</label>
-        <input type="text" id="empName" placeholder="As per NRIC/passport">
-        <div class="row2">
-          <div><label>Employee No.</label><input type="text" id="empNo" placeholder="JEFF001"></div>
-          <div><label>NRIC / Passport</label><input type="text" id="empIC" placeholder="990101-14-5566"></div>
+      <div class="nav-section" id="periodNavSection" style="display:none;">
+        <div class="nav-title">Pay period</div>
+        <div class="period-row">
+          <select id="payMonth"></select>
+          <input type="number" class="side-input" id="payYear">
         </div>
-        <label>Position</label>
-        <input type="text" id="empPosition" placeholder="Sale Executive">
-        <div class="row2">
-          <div>
-            <label>Status</label>
-            <select id="empStatus"><option value="citizen">Malaysian / PR</option><option value="foreign">Foreign worker</option></select>
-          </div>
-          <div>
-            <label>Age group</label>
-            <select id="empAge"><option value="under60">Below 60</option><option value="over60">60 and above</option></select>
-          </div>
-        </div>
-        <button class="btn btn-ghost btn-sm" id="saveProfileBtn" style="width:100%; margin-top:12px;">Save profile</button>
-        <button class="btn btn-danger btn-sm" id="deleteStaffBtn" style="width:100%; margin-top:8px;">Delete this staff</button>
-      </fieldset>
-
-      <fieldset id="periodFieldset" style="display:none;">
-        <legend>Pay period</legend>
-        <div class="row2">
-          <div><label class="first">Month</label><select id="payMonth"></select></div>
-          <div><label class="first">Year</label><input type="number" id="payYear"></div>
-        </div>
-        <button class="btn btn-amber btn-sm" id="sameAsLastBtn" style="width:100%; margin-top:12px;">↻ Same as last month</button>
+        <button class="side-btn" id="sameAsLastBtn">↻ Same as last month</button>
+        <button class="side-btn solid" id="editPayBtn">Edit this month's pay</button>
         <div class="history-list" id="historyList"></div>
-      </fieldset>
+      </div>
 
-      <fieldset id="payFieldset" style="display:none;">
-        <legend>Earnings</legend>
-        <label class="first">Basic pay (RM)</label>
-        <input type="number" id="basicSalary" placeholder="0.00" step="0.01">
-        <div class="row2">
-          <div><label>Daily attendance (RM)</label><input type="number" id="dailyAttendance" placeholder="0.00" step="0.01"></div>
-          <div><label>Meal (RM)</label><input type="number" id="meal" placeholder="0.00" step="0.01"></div>
-        </div>
-        <div class="row2">
-          <div><label>Night shift allowance (RM)</label><input type="number" id="nightShift" placeholder="0.00" step="0.01"></div>
-          <div><label>Bonus / commission (RM)</label><input type="number" id="bonus" placeholder="0.00" step="0.01"></div>
-        </div>
-        <div class="row2">
-          <div><label>Normal OT (RM)</label><input type="number" id="normalOT" placeholder="0.00" step="0.01"></div>
-          <div><label>Rest day OT (RM)</label><input type="number" id="restOT" placeholder="0.00" step="0.01"></div>
-        </div>
-
-        <legend style="margin-top:14px;">Other deductions</legend>
-        <div class="row3">
-          <div><label class="first">Early out (RM)</label><input type="number" id="earlyOut" placeholder="0.00" step="0.01"></div>
-          <div><label class="first">Lateness (RM)</label><input type="number" id="lateness" placeholder="0.00" step="0.01"></div>
-          <div><label class="first">Time off (RM)</label><input type="number" id="timeOff" placeholder="0.00" step="0.01"></div>
-        </div>
-        <div class="row2">
-          <div><label>Unpaid leave (RM)</label><input type="number" id="unpaidLeave" placeholder="0.00" step="0.01"></div>
-          <div><label>PCB / MTD tax (RM)</label><input type="number" id="pcb" placeholder="0.00" step="0.01"></div>
-        </div>
-        <label>Other deduction (RM)</label>
-        <input type="number" id="otherDeduct" placeholder="0.00" step="0.01">
-
-        <button class="btn btn-gold" id="savePayslipBtn" style="margin-top:14px;">Save this month's payslip</button>
-      </fieldset>
-
-      <fieldset>
-        <legend>PERKESO references</legend>
+      <div class="nav-section">
+        <div class="nav-title">PERKESO references</div>
         <div class="ref-links">
-          Rates approximate the First Category schedule under <b>Act 4</b> (Employment Injury + Invalidity) and <b>Act 800</b> (EIS). Age 60+ and the new LINDUNG 24 Jam scheme (from June 2026) are being phased in — confirm exact sen with PERKESO directly:<br>
-          • <a href="https://www.perkeso.gov.my/en/our-services/employer-employee/contribution-calculator.html" target="_blank">Official contribution calculator</a><br>
+          Approximates First Category under <b>Act 4</b> (Employment Injury + Invalidity) &amp; <b>Act 800</b> (EIS). Age 60+ and LINDUNG 24 Jam (from June 2026) are being phased in — confirm exact sen directly:<br>
+          • <a href="https://www.perkeso.gov.my/en/our-services/employer-employee/contribution-calculator.html" target="_blank">Official calculator</a><br>
           • <a href="https://www.perkeso.gov.my/en/our-services/employer-employee/kadar-caruman.html" target="_blank">Contribution rate page</a><br>
           • <a href="https://www.perkeso.gov.my/en/our-services/protection/lindung-24-jam.html" target="_blank">LINDUNG 24 Jam scheme</a>
         </div>
-      </fieldset>
+      </div>
     </div>
   </div>
 
-  <!-- ============ MAIN ============ -->
+  <!-- ============ MAIN — all data entry happens here, wide open screen ============ -->
   <div class="main">
     <div class="toolbar" id="toolbar" style="display:none;">
       <div>
@@ -308,7 +260,7 @@
       <p>Gaji stores every company, staff record and payslip in a Google Sheet you own — free, private, and easy to back up. One-time setup, about 3 minutes.</p>
       <ol class="gate-steps">
         <li>Open <a href="https://sheets.google.com" target="_blank">Google Sheets</a>, create a blank sheet, then go to <b>Extensions → Apps Script</b>.</li>
-        <li>Delete the placeholder code, paste in the <code>gaji-sheets-backend.gs</code> script provided below, and save.</li>
+        <li>Delete the placeholder code, paste in the <code>gaji-sheets-backend.gs</code> script provided, and save.</li>
         <li>Click <b>Deploy → New deployment → Web app</b>. Set <i>Execute as: Me</i> and <i>Who has access: Anyone</i>, then deploy and authorize.</li>
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
@@ -322,10 +274,89 @@
 
     <div id="placeholderView" class="placeholder" style="display:none;">
       <h2>No payslip yet</h2>
-      <div>Add a <b>company</b>, then <b>+ Add new staff</b>, fill in their salary, and click <b>Save this month's payslip</b>. Reuse a prior month instantly with <b>Same as last month</b>, or run the whole company's payroll at once with <b>Print all payslips</b>.</div>
+      <div>Add a <b>company</b>, then <b>+ Add new staff</b>, fill in their salary, and click <b>Save</b>. Reuse a prior month with <b>Same as last month</b>, or run the whole company's payroll at once with <b>Print all payslips</b>.</div>
     </div>
 
+    <!-- Payslip preview (with a quick edit-pay shortcut above it) -->
+    <div class="ps-edit-hint" id="psEditHint" style="display:none;">
+      <button id="psEditPayBtn">✎ Edit this payslip</button>
+    </div>
     <div id="payslipContainer"></div>
+
+    <!-- ===== Open-screen form: Company ===== -->
+    <div class="form-card" id="companyFormCard" style="display:none;">
+      <h2 id="companyFormTitle">Add company</h2>
+      <div class="fc-sub">Company details appear on every payslip you generate.</div>
+      <div class="fc-group"><label class="fc-label">Company name</label><input type="text" class="fc-input" id="companyName" placeholder="e.g. Demo Company Sdn Bhd"></div>
+      <div class="fc-group"><label class="fc-label">Address</label><input type="text" class="fc-input" id="companyAddr" placeholder="Address, city, state"></div>
+      <div class="fc-group"><label class="fc-label">Employer EPF / SOCSO / EIS No.</label><input type="text" class="fc-input" id="companyRefs" placeholder="e.g. E12345678 / S987654"></div>
+      <div class="fc-actions">
+        <button class="fc-btn primary" id="saveCompanyBtn">Save company</button>
+        <button class="fc-btn ghost" id="cancelCompanyBtn">Cancel</button>
+        <button class="fc-btn danger" id="deleteCompanyBtn" style="display:none;">Delete this company</button>
+      </div>
+    </div>
+
+    <!-- ===== Open-screen form: Staff profile ===== -->
+    <div class="form-card" id="staffFormCard" style="display:none;">
+      <h2 id="staffFormTitle">Add staff</h2>
+      <div class="fc-sub">This is saved as the staff member's permanent profile.</div>
+      <div class="fc-group"><label class="fc-label">Full name</label><input type="text" class="fc-input" id="empName" placeholder="As per NRIC/passport"></div>
+      <div class="fc-grid2">
+        <div class="fc-group"><label class="fc-label">Employee no.</label><input type="text" class="fc-input" id="empNo" placeholder="JEFF001"></div>
+        <div class="fc-group"><label class="fc-label">NRIC / Passport</label><input type="text" class="fc-input" id="empIC" placeholder="990101-14-5566"></div>
+      </div>
+      <div class="fc-group"><label class="fc-label">Position</label><input type="text" class="fc-input" id="empPosition" placeholder="Sale Executive"></div>
+      <div class="fc-grid2">
+        <div class="fc-group"><label class="fc-label">Status</label>
+          <select class="fc-select" id="empStatus"><option value="citizen">Malaysian / PR</option><option value="foreign">Foreign worker</option></select>
+        </div>
+        <div class="fc-group"><label class="fc-label">Age group</label>
+          <select class="fc-select" id="empAge"><option value="under60">Below 60</option><option value="over60">60 and above</option></select>
+        </div>
+      </div>
+      <div class="fc-actions">
+        <button class="fc-btn primary" id="saveProfileBtn">Save profile</button>
+        <button class="fc-btn ghost" id="cancelStaffBtn">Cancel</button>
+        <button class="fc-btn danger" id="deleteStaffBtn" style="display:none;">Delete this staff</button>
+      </div>
+    </div>
+
+    <!-- ===== Open-screen form: This month's pay ===== -->
+    <div class="form-card" id="payFormCard" style="display:none;">
+      <h2 id="payFormTitle">This month's pay</h2>
+      <div class="fc-sub" id="payFormSub">Enter salary details for the selected pay period.</div>
+
+      <div class="fc-section-title first">Earnings</div>
+      <div class="fc-group"><label class="fc-label">Basic pay (RM)</label><input type="number" class="fc-input" id="basicSalary" placeholder="0.00" step="0.01"></div>
+      <div class="fc-grid3">
+        <div class="fc-group"><label class="fc-label">Daily attendance (RM)</label><input type="number" class="fc-input" id="dailyAttendance" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Meal (RM)</label><input type="number" class="fc-input" id="meal" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Night shift (RM)</label><input type="number" class="fc-input" id="nightShift" placeholder="0.00" step="0.01"></div>
+      </div>
+      <div class="fc-grid3">
+        <div class="fc-group"><label class="fc-label">Normal OT (RM)</label><input type="number" class="fc-input" id="normalOT" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Rest day OT (RM)</label><input type="number" class="fc-input" id="restOT" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Bonus / commission (RM)</label><input type="number" class="fc-input" id="bonus" placeholder="0.00" step="0.01"></div>
+      </div>
+
+      <div class="fc-section-title">Other deductions</div>
+      <div class="fc-grid3">
+        <div class="fc-group"><label class="fc-label">Early out (RM)</label><input type="number" class="fc-input" id="earlyOut" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Lateness (RM)</label><input type="number" class="fc-input" id="lateness" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Time off (RM)</label><input type="number" class="fc-input" id="timeOff" placeholder="0.00" step="0.01"></div>
+      </div>
+      <div class="fc-grid3">
+        <div class="fc-group"><label class="fc-label">Unpaid leave (RM)</label><input type="number" class="fc-input" id="unpaidLeave" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">PCB / MTD tax (RM)</label><input type="number" class="fc-input" id="pcb" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Other deduction (RM)</label><input type="number" class="fc-input" id="otherDeduct" placeholder="0.00" step="0.01"></div>
+      </div>
+
+      <div class="fc-actions">
+        <button class="fc-btn primary" id="savePayslipBtn">Save this month's payslip</button>
+        <button class="fc-btn ghost" id="cancelPayBtn">Cancel</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -366,7 +397,6 @@
 
   function getSavedUrl(){ try{ return localStorage.getItem(LS_KEY); }catch(e){ return null; } }
   function saveUrl(url){ try{ localStorage.setItem(LS_KEY, url); }catch(e){} }
-  function clearUrl(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
 
   function setConnBadge(state, text){
     const b = document.getElementById('connBadge');
@@ -374,39 +404,46 @@
     document.getElementById('connText').textContent = text;
   }
 
-  // ---------------- API layer (talks to the Google Apps Script backend) ----------------
+  // ---------------- Main-area view switcher ----------------
+  // views: 'payslip' | 'company' | 'staff' | 'pay'
+  function showView(view){
+    document.getElementById('toolbar').style.display = view==='payslip' ? 'flex' : 'none';
+    document.getElementById('placeholderView').style.display = 'none';
+    document.getElementById('psEditHint').style.display = 'none';
+    document.getElementById('payslipContainer').style.display = view==='payslip' ? 'block' : 'none';
+    document.getElementById('companyFormCard').style.display = view==='company' ? 'block' : 'none';
+    document.getElementById('staffFormCard').style.display = view==='staff' ? 'block' : 'none';
+    document.getElementById('payFormCard').style.display = view==='pay' ? 'block' : 'none';
+    if (view==='payslip') renderPayslip();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // ---------------- API layer ----------------
   async function apiCall(action, params, body){
     if (!API_URL) throw new Error('Not connected to a database yet.');
     let url = API_URL + (API_URL.includes('?') ? '&' : '?') + 'action=' + encodeURIComponent(action);
     if (params) for (const k in params) if (params[k] !== undefined && params[k] !== null) url += '&' + k + '=' + encodeURIComponent(params[k]);
     const opts = { method: body ? 'POST' : 'GET' };
-    if (body) opts.body = JSON.stringify(body); // no explicit Content-Type -> avoids CORS preflight
+    if (body) opts.body = JSON.stringify(body);
     const res = await fetch(url, opts);
     if (!res.ok) throw new Error('Server returned ' + res.status);
     const json = await res.json();
     if (json && json.error) throw new Error(json.error);
     return json;
   }
-
   async function testConnection(url){
-    const prev = API_URL;
-    API_URL = url;
-    try{
-      const rows = await apiCall('listCompanies');
-      return { ok:true, rows };
-    } finally {
-      API_URL = prev;
-    }
+    const prev = API_URL; API_URL = url;
+    try{ const rows = await apiCall('listCompanies'); return { ok:true, rows }; }
+    finally{ API_URL = prev; }
   }
 
-  // ---------------- Persistence (mapped onto the sheet-backed API) ----------------
-  const dbLoadAllCompanies   = () => apiCall('listCompanies');
-  const dbSaveCompany        = (co) => apiCall('saveCompany', null, co);
-  const dbDeleteCompany      = (id) => apiCall('deleteCompany', null, {id});
-  const dbLoadStaffForCompany= (companyId) => apiCall('listStaff', {companyId});
-  const dbSaveStaff          = (staff) => apiCall('saveStaff', null, staff);
-  const dbDeleteStaff        = (companyId, id) => apiCall('deleteStaff', null, {id});
-  const dbSavePayslipRaw     = (companyId, staffId, year, month, data) => apiCall('savePayslip', null, {companyId, staffId, year, month, data});
+  const dbLoadAllCompanies    = () => apiCall('listCompanies');
+  const dbSaveCompany         = (co) => apiCall('saveCompany', null, co);
+  const dbDeleteCompany       = (id) => apiCall('deleteCompany', null, {id});
+  const dbLoadStaffForCompany = (companyId) => apiCall('listStaff', {companyId});
+  const dbSaveStaff           = (staff) => apiCall('saveStaff', null, staff);
+  const dbDeleteStaff         = (companyId, id) => apiCall('deleteStaff', null, {id});
+  const dbSavePayslipRaw      = (companyId, staffId, year, month, data) => apiCall('savePayslip', null, {companyId, staffId, year, month, data});
 
   async function dbGetPayslip(companyId, staffId, year, month){
     const key = companyId+':'+staffId+':'+year+'-'+month;
@@ -498,7 +535,6 @@
     return { earnings, deductions, totalEarnings, totalDeductions, netSalary, epfEmployer, socsoEmployer, eisEmployer, employerCost };
   }
 
-  // ---------------- Payslip markup ----------------
   function buildPayslipHTML(company, profile, period, calc, opts){
     opts = opts || {};
     const refs = (company.companyRefs||'').trim();
@@ -554,7 +590,7 @@
     `;
   }
 
-  // ---------------- Rendering: companies ----------------
+  // ---------------- Companies ----------------
   function renderCompanyList(){
     const wrap = document.getElementById('coList');
     wrap.innerHTML = '';
@@ -572,28 +608,17 @@
     currentCompanyId = id;
     const co = companies.find(c=>c.id===id);
     if (!co) return;
-    document.getElementById('companyFieldset').style.display='block';
-    document.getElementById('companyLegend').textContent = 'Company details';
-    document.getElementById('companyName').value = co.companyName||'';
-    document.getElementById('companyAddr').value = co.companyAddr||'';
-    document.getElementById('companyRefs').value = co.companyRefs||'';
     renderCompanyList();
-
-    document.getElementById('staffDirFieldset').style.display='block';
+    document.getElementById('staffNavSection').style.display='block';
+    document.getElementById('periodNavSection').style.display='none';
     currentStaffId = null;
-    document.getElementById('profileFieldset').style.display='none';
-    document.getElementById('periodFieldset').style.display='none';
-    document.getElementById('payFieldset').style.display='none';
-    document.getElementById('printAllBtn').disabled = true;
 
-    try{
-      staffList = await dbLoadStaffForCompany(id);
-    }catch(e){ toast('Could not load staff: ' + e.message, true); staffList = []; }
+    try{ staffList = await dbLoadStaffForCompany(id); }
+    catch(e){ toast('Could not load staff: ' + e.message, true); staffList = []; }
     renderStaffList();
-    document.getElementById('placeholderView').style.display='block';
-    document.getElementById('payslipContainer').innerHTML = '';
     document.getElementById('toolbarSub').textContent = `${co.companyName||'Company'} — select or add a staff member`;
     document.getElementById('printAllBtn').disabled = staffList.length===0;
+    showView('payslip');
   }
 
   function confirmDeleteCompany(id){
@@ -606,15 +631,11 @@
     companies = companies.filter(c=>c.id!==id);
     if (currentCompanyId===id){
       currentCompanyId = null; staffList=[]; currentStaffId=null;
-      document.getElementById('companyFieldset').style.display='none';
-      document.getElementById('staffDirFieldset').style.display='none';
-      document.getElementById('profileFieldset').style.display='none';
-      document.getElementById('periodFieldset').style.display='none';
-      document.getElementById('payFieldset').style.display='none';
-      document.getElementById('placeholderView').style.display='block';
-      document.getElementById('payslipContainer').innerHTML='';
+      document.getElementById('staffNavSection').style.display='none';
+      document.getElementById('periodNavSection').style.display='none';
       document.getElementById('printAllBtn').disabled = true;
       document.getElementById('toolbarSub').textContent = 'Add a company to get started';
+      showView('payslip');
     }
     renderCompanyList();
     toast('Company deleted');
@@ -623,18 +644,26 @@
 
   document.getElementById('addCompanyBtn').addEventListener('click', ()=>{
     currentCompanyId = null;
-    document.getElementById('companyFieldset').style.display='block';
-    document.getElementById('companyLegend').textContent = 'New company';
+    document.getElementById('companyFormTitle').textContent = 'Add company';
     document.getElementById('companyName').value='';
     document.getElementById('companyAddr').value='';
     document.getElementById('companyRefs').value='';
-    document.getElementById('staffDirFieldset').style.display='none';
-    document.getElementById('profileFieldset').style.display='none';
-    document.getElementById('periodFieldset').style.display='none';
-    document.getElementById('payFieldset').style.display='none';
+    document.getElementById('deleteCompanyBtn').style.display='none';
     renderCompanyList();
+    showView('company');
     document.getElementById('companyName').focus();
   });
+  document.getElementById('editCompanyBtn').addEventListener('click', ()=>{
+    const co = companies.find(c=>c.id===currentCompanyId);
+    if (!co) return;
+    document.getElementById('companyFormTitle').textContent = 'Edit company';
+    document.getElementById('companyName').value = co.companyName||'';
+    document.getElementById('companyAddr').value = co.companyAddr||'';
+    document.getElementById('companyRefs').value = co.companyRefs||'';
+    document.getElementById('deleteCompanyBtn').style.display='inline-flex';
+    showView('company');
+  });
+  document.getElementById('cancelCompanyBtn').addEventListener('click', ()=>showView(currentCompanyId?'payslip':'payslip'));
 
   document.getElementById('saveCompanyBtn').addEventListener('click', async ()=>{
     const data = {
@@ -650,18 +679,18 @@
         companies[idx] = saved;
         toast('Company updated');
         renderCompanyList();
-        renderPayslip();
+        showView('payslip');
       } else {
         const saved = await dbSaveCompany(data);
         companies.push(saved);
-        toast('Company added');
+        toast('Company added — now add your first staff member');
         await selectCompany(saved.id);
       }
     }catch(e){ toast('Save failed: ' + e.message, true); }
   });
   document.getElementById('deleteCompanyBtn').addEventListener('click', ()=>{ if(currentCompanyId) confirmDeleteCompany(currentCompanyId); });
 
-  // ---------------- Rendering: staff ----------------
+  // ---------------- Staff ----------------
   function renderStaffList(){
     const list = document.getElementById('staffList');
     const empty = document.getElementById('staffEmpty');
@@ -711,13 +740,10 @@
     currentStaffId = id;
     const staff = staffList.find(s=>s.id===id);
     if (!staff) return;
-    document.getElementById('profileFieldset').style.display='block';
-    document.getElementById('periodFieldset').style.display='block';
-    document.getElementById('payFieldset').style.display='block';
-    document.getElementById('profileLegend').textContent = 'Staff profile';
-    fillProfileForm(staff);
+    document.getElementById('periodNavSection').style.display='block';
     renderStaffList();
     await loadPeriod();
+    showView('payslip');
   }
 
   async function loadPeriod(){
@@ -738,8 +764,8 @@
     if (!currentStaffId){ wrap.innerHTML=''; return; }
     let history = [];
     try{ history = await dbListStaffHistory(currentCompanyId, currentStaffId); }catch(e){}
-    if (history.length===0){ wrap.innerHTML = '<div class="empty-note">No saved payslips yet for this staff.</div>'; return; }
-    wrap.innerHTML = '<div style="font-size:10px; color:#8a97a2; margin:10px 0 6px;">Saved months</div>';
+    if (history.length===0){ wrap.innerHTML = '<div class="empty-note">No saved payslips yet.</div>'; return; }
+    wrap.innerHTML = '<div style="font-size:10.5px; color:#c9d4dc; margin:10px 0 6px;">Saved months</div>';
     history.forEach(p=>{
       const chip = document.createElement('span');
       const isCurrent = p.year===currentYear && p.month===currentMonth;
@@ -749,52 +775,61 @@
         document.getElementById('payYear').value = p.year;
         monthSel.value = p.month;
         loadPeriod();
+        showView('payslip');
       });
       wrap.appendChild(chip);
     });
   }
 
-  function markDirty(){ isDirty = true; renderPayslip(); }
+  function markDirty(){ isDirty = true; }
 
   function renderPayslip(){
     const container = document.getElementById('payslipContainer');
     if (!currentStaffId || !currentCompanyId){
       document.getElementById('placeholderView').style.display='block';
+      document.getElementById('psEditHint').style.display='none';
       container.innerHTML=''; return;
     }
     const staff = staffList.find(s=>s.id===currentStaffId);
     const co = companies.find(c=>c.id===currentCompanyId);
     if (!staff || !co) return;
-    const profile = readProfileForm();
     const pay = readPayForm();
     const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
     if (!hasAnyPay){
       document.getElementById('placeholderView').style.display='block';
+      document.getElementById('psEditHint').style.display='none';
       container.innerHTML=''; return;
     }
     document.getElementById('placeholderView').style.display='none';
-    const calc = calcStatutory(profile, pay);
-    document.getElementById('toolbarSub').textContent = `${co.companyName||'Company'} · ${profile.empName||'Employee'} — ${titleCase(MONTHS[currentMonth])} ${currentYear}`;
+    document.getElementById('psEditHint').style.display='flex';
+    const calc = calcStatutory(staff, pay);
+    document.getElementById('toolbarSub').textContent = `${co.companyName||'Company'} · ${staff.empName||'Employee'} — ${titleCase(MONTHS[currentMonth])} ${currentYear}`;
     const div = document.createElement('div');
     div.className = 'payslip';
-    div.innerHTML = buildPayslipHTML(co, profile, {year: currentYear, month: currentMonth}, calc, {dirty:isDirty});
+    div.innerHTML = buildPayslipHTML(co, staff, {year: currentYear, month: currentMonth}, calc, {dirty:isDirty});
     container.innerHTML = '';
     container.appendChild(div);
   }
 
-  // ---------------- Actions: staff ----------------
   document.getElementById('addStaffBtn').addEventListener('click', ()=>{
     currentStaffId = null;
-    document.getElementById('profileFieldset').style.display='block';
-    document.getElementById('periodFieldset').style.display='none';
-    document.getElementById('payFieldset').style.display='none';
-    document.getElementById('profileLegend').textContent = 'New staff profile';
+    document.getElementById('staffFormTitle').textContent = 'Add staff';
     fillProfileForm({});
-    document.getElementById('placeholderView').style.display='block';
-    document.getElementById('payslipContainer').innerHTML='';
+    document.getElementById('deleteStaffBtn').style.display='none';
     renderStaffList();
+    showView('staff');
     document.getElementById('empName').focus();
   });
+
+  function openEditStaff(){
+    const staff = staffList.find(s=>s.id===currentStaffId);
+    if (!staff) return;
+    document.getElementById('staffFormTitle').textContent = 'Edit staff';
+    fillProfileForm(staff);
+    document.getElementById('deleteStaffBtn').style.display='inline-flex';
+    showView('staff');
+  }
+  document.getElementById('cancelStaffBtn').addEventListener('click', ()=>showView('payslip'));
 
   document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
     const profile = readProfileForm();
@@ -809,14 +844,15 @@
         const saved = await dbSaveStaff(Object.assign({companyId: currentCompanyId}, profile));
         staffList.push(saved);
         currentStaffId = saved.id;
-        toast('New staff added');
+        toast('New staff added — now enter their pay');
       }
     }catch(e){ toast('Save failed: ' + e.message, true); return; }
     renderStaffList();
-    document.getElementById('periodFieldset').style.display='block';
-    document.getElementById('payFieldset').style.display='block';
+    document.getElementById('periodNavSection').style.display='block';
     document.getElementById('printAllBtn').disabled = staffList.length===0;
     await loadPeriod();
+    showView(currentStaffId ? 'pay' : 'payslip');
+    if (currentStaffId) openEditPay();
   });
 
   function confirmDeleteStaff(id){
@@ -830,11 +866,8 @@
     delete staffHistoryCache[currentCompanyId+':'+id];
     if (currentStaffId===id){
       currentStaffId = null;
-      document.getElementById('profileFieldset').style.display='none';
-      document.getElementById('periodFieldset').style.display='none';
-      document.getElementById('payFieldset').style.display='none';
-      document.getElementById('placeholderView').style.display='block';
-      document.getElementById('payslipContainer').innerHTML='';
+      document.getElementById('periodNavSection').style.display='none';
+      showView('payslip');
     }
     document.getElementById('printAllBtn').disabled = staffList.length===0;
     renderStaffList();
@@ -842,17 +875,28 @@
   }
   document.getElementById('deleteStaffBtn').addEventListener('click', ()=>{ if(currentStaffId) confirmDeleteStaff(currentStaffId); });
 
+  // ---------------- Pay entry ----------------
+  function openEditPay(){
+    if (!currentStaffId) return;
+    const staff = staffList.find(s=>s.id===currentStaffId);
+    document.getElementById('payFormTitle').textContent = `${staff ? staff.empName : 'Staff'}'s pay — ${titleCase(MONTHS[currentMonth])} ${currentYear}`;
+    document.getElementById('payFormSub').textContent = 'These figures are used to auto-calculate EPF, SOCSO and EIS.';
+    showView('pay');
+  }
+  document.getElementById('editPayBtn').addEventListener('click', openEditPay);
+  document.getElementById('psEditPayBtn').addEventListener('click', openEditPay);
+  document.getElementById('cancelPayBtn').addEventListener('click', ()=>showView('payslip'));
+
   document.getElementById('savePayslipBtn').addEventListener('click', async ()=>{
     if (!currentStaffId){ alert('Please add and save a staff profile first.'); return; }
     const pay = readPayForm();
-    try{
-      await dbSavePayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, pay);
-    }catch(e){ toast('Save failed: ' + e.message, true); return; }
+    try{ await dbSavePayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, pay); }
+    catch(e){ toast('Save failed: ' + e.message, true); return; }
     delete staffHistoryCache[currentCompanyId+':'+currentStaffId];
     isDirty = false;
     await renderHistoryChips();
-    renderPayslip();
     toast(`Payslip saved for ${titleCase(MONTHS[currentMonth])} ${currentYear}`);
+    showView('payslip');
   });
 
   document.getElementById('sameAsLastBtn').addEventListener('click', async ()=>{
@@ -864,7 +908,8 @@
     if (!prev){ toast(`No saved payslip found for ${titleCase(MONTHS[py])} ${yy}`); return; }
     fillPayForm(prev);
     markDirty();
-    toast(`Copied figures from ${titleCase(MONTHS[py])} ${yy} — remember to save`);
+    toast(`Copied figures from ${titleCase(MONTHS[py])} ${yy} — review and save`);
+    openEditPay();
   });
 
   document.getElementById('printBtn').addEventListener('click', ()=>window.print());
@@ -899,7 +944,6 @@
 
   monthSel.addEventListener('change', loadPeriod);
   document.getElementById('payYear').addEventListener('change', loadPeriod);
-  ['empName','empNo','empIC','empPosition','empStatus','empAge'].forEach(id=>document.getElementById(id).addEventListener('input', renderPayslip));
   PAY_FIELDS.forEach(id=>document.getElementById(id).addEventListener('input', markDirty));
 
   // ---------------- Connection flow ----------------
@@ -914,13 +958,12 @@
       saveUrl(url);
       setConnBadge('ok', 'Connected to Google Sheet');
       document.getElementById('gateView').style.display = 'none';
-      document.getElementById('appPanels').style.display = 'block';
-      document.getElementById('toolbar').style.display = 'flex';
+      document.getElementById('navPanels').style.display = 'block';
       companies = test.rows || [];
       renderCompanyList();
       if (companies.length > 0) await selectCompany(companies[0].id);
-      else { document.getElementById('placeholderView').style.display='block'; }
-      toast('Connected! Your payroll data will now sync to your Google Sheet.');
+      else { showView('payslip'); document.getElementById('toolbarSub').textContent = 'Add a company to get started'; }
+      toast('Connected! Your payroll data now syncs to your Google Sheet.');
     }catch(e){
       errBox.textContent = 'Could not connect: ' + e.message + '. Double-check the URL and that the deployment access is set to "Anyone".';
       errBox.style.display = 'block';
@@ -938,10 +981,14 @@
   document.getElementById('gateUrlInput').addEventListener('keydown', (e)=>{ if (e.key==='Enter') document.getElementById('gateConnectBtn').click(); });
 
   document.getElementById('connManageBtn').addEventListener('click', ()=>{
-    document.getElementById('appPanels').style.display = 'none';
+    document.getElementById('navPanels').style.display = 'none';
     document.getElementById('toolbar').style.display = 'none';
     document.getElementById('placeholderView').style.display = 'none';
+    document.getElementById('psEditHint').style.display = 'none';
     document.getElementById('payslipContainer').innerHTML = '';
+    document.getElementById('companyFormCard').style.display = 'none';
+    document.getElementById('staffFormCard').style.display = 'none';
+    document.getElementById('payFormCard').style.display = 'none';
     document.getElementById('gateView').style.display = 'block';
     document.getElementById('gateUrlInput').value = API_URL || '';
   });
