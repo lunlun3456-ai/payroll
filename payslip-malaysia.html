@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaji — Payroll System Malaysia</title>
+<style>
+  :root{
+    --ink:#0f2438; --ink-soft:#3a5068; --paper:#f6f3ec; --panel:#ffffff;
+    --line:#dcd6c8; --gold:#b8863c; --gold-deep:#8f6428; --green:#2f6d4f; --red:#a3402f;
+    --shadow: 0 1px 2px rgba(15,36,56,.06), 0 8px 24px rgba(15,36,56,.06);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background: var(--paper); color: var(--ink); font-family: "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; }
+  .app{ display:grid; grid-template-columns: 380px 1fr; min-height:100vh; }
+
+  .sidebar{ background: var(--ink); color: #eef2f5; padding: 26px 22px 40px; overflow-y:auto; }
+  .brand{ display:flex; align-items:baseline; gap:10px; margin-bottom: 4px; }
+  .brand-mark{ font-family:"Iowan Old Style","Georgia",serif; font-size:25px; font-weight:700; letter-spacing:.5px; color: var(--gold); }
+  .brand-sub{ font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:#9fb0bf; }
+  .tagline{ font-size:12px; color:#b9c6d1; margin: 5px 0 16px; line-height:1.5; }
+
+  .conn-badge{ display:flex; align-items:center; gap:8px; font-size:11.5px; padding:9px 12px; border-radius:8px; margin-bottom:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); }
+  .conn-badge .dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .conn-badge.ok .dot{ background:#4fae72; box-shadow:0 0 0 3px rgba(79,174,114,.18); }
+  .conn-badge.off .dot{ background:#6b7a86; }
+  .conn-badge.err .dot{ background:#c9583f; }
+  .conn-badge.ok{ color:#a9d9bc; }
+  .conn-badge.off{ color:#9fb0bf; }
+  .conn-badge.err{ color:#e6a596; }
+  .conn-badge button{ margin-left:auto; background:none; border:none; color:inherit; text-decoration:underline; font-size:11px; cursor:pointer; font-family:inherit; padding:0; opacity:.8; }
+  .conn-badge button:hover{ opacity:1; }
+
+  fieldset{ border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:14px 15px 13px; margin: 0 0 14px; }
+  legend{ font-size:10.5px; text-transform:uppercase; letter-spacing:1.6px; color: var(--gold); padding:0 6px; font-weight:600; }
+  label{ display:block; font-size:11.5px; color:#c4cfd8; margin: 9px 0 4px; }
+  label.first{margin-top:0;}
+  input[type=text], input[type=number], input[type=url], select{
+    width:100%; padding:7px 9px; border-radius:6px; border:1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.06); color:#f3f6f8; font-size:13px; outline:none; font-family:inherit;
+  }
+  input::placeholder{color:#7d8b97;}
+  input:focus, select:focus{ border-color: var(--gold); background: rgba(255,255,255,.1); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  .row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  select{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23b9c6d1'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:10px 14px; border-radius:7px; border:none; font-size:13px; font-weight:600; letter-spacing:.3px; cursor:pointer; font-family:inherit; }
+  .btn:active{ transform: translateY(1px); }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .btn-gold{ background: linear-gradient(180deg,var(--gold),var(--gold-deep)); color:#1c1204; margin-top:6px;}
+  .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,.25); color:#eef2f5; }
+  .btn-amber{ background: rgba(184,134,60,.16); border:1px solid var(--gold); color:#f0d9b3; }
+  .btn-danger{ background:transparent; border:1px solid rgba(163,64,47,.5); color:#e9a898; }
+  .btn-sm{ padding:7px 10px; font-size:12px; width:auto; }
+
+  .co-list{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .co-chip{ font-size:12px; padding:6px 11px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); cursor:pointer; display:flex; align-items:center; gap:6px; }
+  .co-chip:hover{ border-color:var(--gold); }
+  .co-chip.active{ background:rgba(184,134,60,.18); border-color:var(--gold); color:#f0d9b3; font-weight:600; }
+  .co-chip .x{ color:#e9a898; font-size:12px; }
+  .add-chip{ font-size:12px; padding:6px 11px; border-radius:14px; border:1px dashed rgba(255,255,255,.3); background:transparent; color:#dbe4ea; cursor:pointer; font-family:inherit; }
+  .add-chip:hover{ border-color:var(--gold); color:var(--gold); }
+
+  .staff-list{ margin-top:2px; max-height:190px; overflow-y:auto; }
+  .staff-item{ display:flex; justify-content:space-between; align-items:center; padding:9px 11px; border-radius:7px; margin-bottom:6px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); cursor:pointer; font-size:13px; }
+  .staff-item:hover{ background: rgba(255,255,255,.09); }
+  .staff-item.active{ border-color: var(--gold); background: rgba(184,134,60,.14); }
+  .staff-name{ font-weight:600; }
+  .staff-role{ font-size:10.5px; color:#9fb0bf; }
+  .staff-item .x{ color:#e9a898; font-size:15px; padding:2px 6px; }
+  .empty-note{ font-size:11.5px; color:#8a97a2; padding:6px 2px; }
+  .add-staff-btn{ display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:8px; margin-bottom:10px; border-radius:7px; border:1px dashed rgba(255,255,255,.3); background:transparent; color:#dbe4ea; font-size:12px; cursor:pointer; font-family:inherit; }
+  .add-staff-btn:hover{ border-color: var(--gold); color:var(--gold); }
+
+  .history-chip{ display:inline-flex; align-items:center; gap:6px; font-size:11px; padding:5px 9px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); margin:0 5px 5px 0; cursor:pointer; }
+  .history-chip:hover{ border-color:var(--gold); color:var(--gold); }
+  .history-chip.current{ border-color:var(--gold); background:rgba(184,134,60,.16); }
+
+  .ref-links{ font-size:10.5px; line-height:1.9; margin-top:4px; color:#aebac3; }
+  .ref-links a{ color:#9fc7dd; text-decoration:none; }
+  .ref-links a:hover{ text-decoration:underline; }
+
+  .main{ padding: 30px 40px 60px; display:flex; flex-direction:column; align-items:center; }
+  .toolbar{ width:100%; max-width:800px; display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+  .toolbar h1{ font-family:"Iowan Old Style","Georgia",serif; font-size:19px; margin:0; color:var(--ink); }
+  .toolbar .sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .toolbar-actions{ display:flex; gap:8px; }
+  .btn-outline{ background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:9px 15px; border-radius:7px; font-size:12.5px; cursor:pointer; font-family:inherit; }
+  .btn-outline:hover{ border-color:var(--gold); color:var(--gold-deep); }
+  .btn-outline:disabled{ opacity:.4; cursor:not-allowed; }
+
+  /* ---- payslip: bordered-box template style ---- */
+  .payslip{ width:100%; max-width:800px; background:#fff; box-shadow: var(--shadow); border:2px solid #111; margin-bottom:20px; font-family: Arial, Helvetica, sans-serif; }
+  .ps-topbox{ display:flex; justify-content:space-between; padding:18px 24px; border-bottom:2px solid #111; }
+  .ps-company{ font-size:19px; font-weight:700; color:#111; }
+  .ps-period{ font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; text-align:right; }
+  .ps-idbox{ display:flex; justify-content:space-between; padding:14px 24px; border-bottom:2px solid #111; font-size:12.5px; }
+  .ps-idbox .left, .ps-idbox .right{ line-height:1.9; }
+  .ps-idbox .lbl{ display:inline-block; width:90px; color:#333; font-weight:600; }
+  .ps-idbox .right .lbl{ width:100px; }
+  .ps-cols{ display:grid; grid-template-columns:1fr 1fr; }
+  .ps-col{ padding:0; }
+  .ps-col.left{ border-right:2px solid #111; }
+  .ps-col-head{ font-size:12.5px; font-weight:700; text-align:center; text-transform:uppercase; padding:9px 0; border-bottom:2px solid #111; letter-spacing:.5px; }
+  .ps-col-body{ padding:10px 20px; min-height:120px; }
+  .ps-line{ display:flex; justify-content:space-between; font-size:12.5px; padding:5px 0; }
+  .ps-line .l{ text-transform:uppercase; letter-spacing:.2px; }
+  .ps-totals-row{ display:grid; grid-template-columns:1fr 1fr; border-top:2px solid #111; }
+  .ps-totals-cell{ padding:10px 20px; font-size:12.5px; font-weight:700; display:flex; justify-content:space-between; text-transform:uppercase; }
+  .ps-totals-cell.left{ border-right:2px solid #111; }
+  .ps-employer-row{ display:grid; grid-template-columns:1fr 1fr; border-top:2px solid #111; }
+  .ps-employer-cell{ padding:10px 20px; border-right:2px solid #111; }
+  .ps-employer-cell .ps-line{ font-size:12px; }
+  .ps-net-cell{ padding:10px 20px; display:flex; align-items:center; justify-content:space-between; }
+  .ps-net-cell .l{ font-size:13.5px; font-weight:700; text-transform:uppercase; }
+  .ps-net-cell .v{ font-size:17px; font-weight:700; color:var(--green); }
+  .ps-sign{ display:flex; justify-content:space-between; padding:26px 24px 20px; border-top:2px solid #111; font-size:12px; gap:20px; }
+  .ps-sign div{ flex:1; }
+  .ps-sign .line{ border-bottom:1px solid #111; margin-top:26px; }
+  .ps-draft{ font-size:10px; color:var(--red); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+
+  .placeholder{ width:100%; max-width:800px; background:var(--panel); border:1px dashed var(--line); border-radius:8px; padding:60px 30px; text-align:center; color:var(--ink-soft); }
+  .placeholder h2{ font-family:"Iowan Old Style","Georgia",serif; color:var(--ink); margin-bottom:8px; }
+
+  /* ---- connection gate (first-run onboarding) ---- */
+  .gate{ width:100%; max-width:560px; background:var(--panel); border-radius:12px; box-shadow:var(--shadow); border-top:5px solid var(--gold); padding:40px 40px 34px; }
+  .gate h2{ font-family:"Iowan Old Style","Georgia",serif; font-size:22px; margin:0 0 6px; }
+  .gate p{ font-size:13.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 22px; }
+  .gate-steps{ counter-reset:step; margin:0 0 22px; padding:0; list-style:none; }
+  .gate-steps li{ counter-increment:step; position:relative; padding:0 0 18px 38px; font-size:13.5px; line-height:1.6; color:var(--ink); }
+  .gate-steps li::before{ content:counter(step); position:absolute; left:0; top:0; width:24px; height:24px; border-radius:50%; background:var(--ink); color:var(--gold); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .gate-steps a{ color:var(--gold-deep); font-weight:600; text-decoration:none; }
+  .gate-steps a:hover{ text-decoration:underline; }
+  .gate-steps code{ background:#f1ede3; padding:1px 6px; border-radius:4px; font-size:12.5px; }
+  .gate-input-row{ display:flex; gap:8px; margin-top:4px; }
+  .gate-input-row input{ flex:1; padding:11px 13px; border-radius:8px; border:1px solid var(--line); font-size:13px; font-family:inherit; }
+  .gate-input-row input:focus{ outline:none; border-color:var(--gold); }
+  .gate-connect-btn{ padding:11px 20px; border-radius:8px; border:none; background:linear-gradient(180deg,var(--gold),var(--gold-deep)); color:#1c1204; font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap; }
+  .gate-connect-btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .gate-error{ font-size:12.5px; color:var(--red); margin-top:10px; display:none; }
+  .gate-download{ margin-top:20px; font-size:12px; color:var(--ink-soft); }
+  .gate-download a{ color:var(--gold-deep); font-weight:600; }
+
+  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:10px 18px; border-radius:8px; font-size:13px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:all .25s ease; z-index:50; max-width:80vw; text-align:center; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.err{ background:#5c261c; }
+
+  #batchPrintArea{ display:none; }
+
+  @media print{
+    body{ background:#fff; }
+    .sidebar, .toolbar, .toast{ display:none !important; }
+    .main{ padding:0; }
+    .payslip{ box-shadow:none; max-width:100%; margin-bottom:0; }
+    body:not(.batch-mode) .payslip.batch-only{ display:none !important; }
+    body.batch-mode .main > .payslip:not(.batch-only), body.batch-mode .placeholder{ display:none !important; }
+    body.batch-mode #batchPrintArea{ display:block; }
+    body.batch-mode #batchPrintArea .payslip{ page-break-after: always; }
+    body.batch-mode #batchPrintArea .payslip:last-child{ page-break-after: auto; }
+  }
+  @media (max-width: 900px){
+    .app{ grid-template-columns:1fr; }
+    .sidebar{ order:2; }
+    .main{ padding:22px 14px 40px; }
+    .ps-cols, .ps-totals-row, .ps-employer-row{ grid-template-columns:1fr; }
+    .ps-col.left, .ps-totals-cell.left, .ps-employer-cell{ border-right:none; border-bottom:2px solid #111; }
+    .ps-sign{ flex-direction:column; }
+    .gate{ padding:28px 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <div class="sidebar">
+    <div class="brand"><span class="brand-mark">Gaji</span><span class="brand-sub">Payroll System MY</span></div>
+    <div class="tagline">Multi-company Malaysian payroll, synced live to your own Google Sheet. Staff records, monthly payslips, EPF/SOCSO/EIS calculated automatically.</div>
+
+    <div class="conn-badge off" id="connBadge">
+      <span class="dot"></span>
+      <span id="connText">Not connected</span>
+      <button id="connManageBtn">Manage</button>
+    </div>
+
+    <div id="appPanels" style="display:none;">
+      <fieldset>
+        <legend>Companies</legend>
+        <div class="co-list" id="coList"></div>
+        <button class="add-chip" id="addCompanyBtn">+ Add company</button>
+      </fieldset>
+
+      <fieldset id="companyFieldset" style="display:none;">
+        <legend id="companyLegend">Company details</legend>
+        <label class="first">Company name</label>
+        <input type="text" id="companyName" placeholder="Sdn Bhd name">
+        <label>Address</label>
+        <input type="text" id="companyAddr" placeholder="Address, city, state">
+        <label>Employer EPF / SOCSO / EIS No.</label>
+        <input type="text" id="companyRefs" placeholder="e.g. E12345678 / S987654">
+        <button class="btn btn-ghost btn-sm" id="saveCompanyBtn" style="width:100%; margin-top:12px;">Save company</button>
+        <button class="btn btn-danger btn-sm" id="deleteCompanyBtn" style="width:100%; margin-top:8px;">Delete this company</button>
+      </fieldset>
+
+      <fieldset id="staffDirFieldset" style="display:none;">
+        <legend>Staff at this company</legend>
+        <button class="add-staff-btn" id="addStaffBtn">+ Add new staff</button>
+        <div class="staff-list" id="staffList"></div>
+        <div class="empty-note" id="staffEmpty">No staff saved yet for this company.</div>
+      </fieldset>
+
+      <fieldset id="profileFieldset" style="display:none;">
+        <legend id="profileLegend">Staff profile</legend>
+        <label class="first">Full name</label>
+        <input type="text" id="empName" placeholder="As per NRIC/passport">
+        <div class="row2">
+          <div><label>Employee No.</label><input type="text" id="empNo" placeholder="JEFF001"></div>
+          <div><label>NRIC / Passport</label><input type="text" id="empIC" placeholder="990101-14-5566"></div>
+        </div>
+        <label>Position</label>
+        <input type="text" id="empPosition" placeholder="Sale Executive">
+        <div class="row2">
+          <div>
+            <label>Status</label>
+            <select id="empStatus"><option value="citizen">Malaysian / PR</option><option value="foreign">Foreign worker</option></select>
+          </div>
+          <div>
+            <label>Age group</label>
+            <select id="empAge"><option value="under60">Below 60</option><option value="over60">60 and above</option></select>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="saveProfileBtn" style="width:100%; margin-top:12px;">Save profile</button>
+        <button class="btn btn-danger btn-sm" id="deleteStaffBtn" style="width:100%; margin-top:8px;">Delete this staff</button>
+      </fieldset>
+
+      <fieldset id="periodFieldset" style="display:none;">
+        <legend>Pay period</legend>
+        <div class="row2">
+          <div><label class="first">Month</label><select id="payMonth"></select></div>
+          <div><label class="first">Year</label><input type="number" id="payYear"></div>
+        </div>
+        <button class="btn btn-amber btn-sm" id="sameAsLastBtn" style="width:100%; margin-top:12px;">↻ Same as last month</button>
+        <div class="history-list" id="historyList"></div>
+      </fieldset>
+
+      <fieldset id="payFieldset" style="display:none;">
+        <legend>Earnings</legend>
+        <label class="first">Basic pay (RM)</label>
+        <input type="number" id="basicSalary" placeholder="0.00" step="0.01">
+        <div class="row2">
+          <div><label>Daily attendance (RM)</label><input type="number" id="dailyAttendance" placeholder="0.00" step="0.01"></div>
+          <div><label>Meal (RM)</label><input type="number" id="meal" placeholder="0.00" step="0.01"></div>
+        </div>
+        <div class="row2">
+          <div><label>Night shift allowance (RM)</label><input type="number" id="nightShift" placeholder="0.00" step="0.01"></div>
+          <div><label>Bonus / commission (RM)</label><input type="number" id="bonus" placeholder="0.00" step="0.01"></div>
+        </div>
+        <div class="row2">
+          <div><label>Normal OT (RM)</label><input type="number" id="normalOT" placeholder="0.00" step="0.01"></div>
+          <div><label>Rest day OT (RM)</label><input type="number" id="restOT" placeholder="0.00" step="0.01"></div>
+        </div>
+
+        <legend style="margin-top:14px;">Other deductions</legend>
+        <div class="row3">
+          <div><label class="first">Early out (RM)</label><input type="number" id="earlyOut" placeholder="0.00" step="0.01"></div>
+          <div><label class="first">Lateness (RM)</label><input type="number" id="lateness" placeholder="0.00" step="0.01"></div>
+          <div><label class="first">Time off (RM)</label><input type="number" id="timeOff" placeholder="0.00" step="0.01"></div>
+        </div>
+        <div class="row2">
+          <div><label>Unpaid leave (RM)</label><input type="number" id="unpaidLeave" placeholder="0.00" step="0.01"></div>
+          <div><label>PCB / MTD tax (RM)</label><input type="number" id="pcb" placeholder="0.00" step="0.01"></div>
+        </div>
+        <label>Other deduction (RM)</label>
+        <input type="number" id="otherDeduct" placeholder="0.00" step="0.01">
+
+        <button class="btn btn-gold" id="savePayslipBtn" style="margin-top:14px;">Save this month's payslip</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>PERKESO references</legend>
+        <div class="ref-links">
+          Rates approximate the First Category schedule under <b>Act 4</b> (Employment Injury + Invalidity) and <b>Act 800</b> (EIS). Age 60+ and the new LINDUNG 24 Jam scheme (from June 2026) are being phased in — confirm exact sen with PERKESO directly:<br>
+          • <a href="https://www.perkeso.gov.my/en/our-services/employer-employee/contribution-calculator.html" target="_blank">Official contribution calculator</a><br>
+          • <a href="https://www.perkeso.gov.my/en/our-services/employer-employee/kadar-caruman.html" target="_blank">Contribution rate page</a><br>
+          • <a href="https://www.perkeso.gov.my/en/our-services/protection/lindung-24-jam.html" target="_blank">LINDUNG 24 Jam scheme</a>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="toolbar" id="toolbar" style="display:none;">
+      <div>
+        <h1>Payslip preview</h1>
+        <div class="sub" id="toolbarSub">Add a company to get started</div>
+      </div>
+      <div class="toolbar-actions">
+        <button class="btn-outline" id="printAllBtn" disabled>Print all payslips (this month)</button>
+        <button class="btn-outline" id="printBtn">Print / Save PDF</button>
+      </div>
+    </div>
+
+    <!-- First-run connection gate -->
+    <div class="gate" id="gateView">
+      <h2>Connect your payroll database</h2>
+      <p>Gaji stores every company, staff record and payslip in a Google Sheet you own — free, private, and easy to back up. One-time setup, about 3 minutes.</p>
+      <ol class="gate-steps">
+        <li>Open <a href="https://sheets.google.com" target="_blank">Google Sheets</a>, create a blank sheet, then go to <b>Extensions → Apps Script</b>.</li>
+        <li>Delete the placeholder code, paste in the <code>gaji-sheets-backend.gs</code> script provided below, and save.</li>
+        <li>Click <b>Deploy → New deployment → Web app</b>. Set <i>Execute as: Me</i> and <i>Who has access: Anyone</i>, then deploy and authorize.</li>
+        <li>Copy the Web App URL it gives you and paste it below.</li>
+      </ol>
+      <div class="gate-input-row">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+        <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
+      </div>
+      <div class="gate-error" id="gateError"></div>
+      <div class="gate-download">Haven't downloaded the backend script yet? <a href="#" id="gateDownloadLink">Get gaji-sheets-backend.gs</a></div>
+    </div>
+
+    <div id="placeholderView" class="placeholder" style="display:none;">
+      <h2>No payslip yet</h2>
+      <div>Add a <b>company</b>, then <b>+ Add new staff</b>, fill in their salary, and click <b>Save this month's payslip</b>. Reuse a prior month instantly with <b>Same as last month</b>, or run the whole company's payroll at once with <b>Print all payslips</b>.</div>
+    </div>
+
+    <div id="payslipContainer"></div>
+  </div>
+</div>
+
+<div id="batchPrintArea"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const MONTHS = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+  const titleCase = (s) => s[0] + s.slice(1).toLowerCase();
+  const monthSel = document.getElementById('payMonth');
+  MONTHS.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=titleCase(m); monthSel.appendChild(o); });
+
+  const PAY_FIELDS = ['basicSalary','dailyAttendance','meal','nightShift','bonus','normalOT','restOT','earlyOut','lateness','timeOff','unpaidLeave','pcb','otherDeduct'];
+  const LS_KEY = 'gaji_apps_script_url';
+
+  let API_URL = null;
+  let companies = [];
+  let currentCompanyId = null;
+  let staffList = [];
+  let currentStaffId = null;
+  let currentYear = new Date().getFullYear();
+  let currentMonth = new Date().getMonth();
+  let payslipCache = {};
+  let staffHistoryCache = {};
+  let isDirty = false;
+
+  document.getElementById('payYear').value = currentYear;
+  monthSel.value = currentMonth;
+
+  function toast(msg, isErr){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.toggle('err', !!isErr); t.classList.add('show');
+    clearTimeout(t._timer); t._timer = setTimeout(()=>t.classList.remove('show'), 2600);
+  }
+  const fmt = (n) => (isFinite(n)?n:0).toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const esc = (s) => (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function getSavedUrl(){ try{ return localStorage.getItem(LS_KEY); }catch(e){ return null; } }
+  function saveUrl(url){ try{ localStorage.setItem(LS_KEY, url); }catch(e){} }
+  function clearUrl(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
+
+  function setConnBadge(state, text){
+    const b = document.getElementById('connBadge');
+    b.className = 'conn-badge ' + state;
+    document.getElementById('connText').textContent = text;
+  }
+
+  // ---------------- API layer (talks to the Google Apps Script backend) ----------------
+  async function apiCall(action, params, body){
+    if (!API_URL) throw new Error('Not connected to a database yet.');
+    let url = API_URL + (API_URL.includes('?') ? '&' : '?') + 'action=' + encodeURIComponent(action);
+    if (params) for (const k in params) if (params[k] !== undefined && params[k] !== null) url += '&' + k + '=' + encodeURIComponent(params[k]);
+    const opts = { method: body ? 'POST' : 'GET' };
+    if (body) opts.body = JSON.stringify(body); // no explicit Content-Type -> avoids CORS preflight
+    const res = await fetch(url, opts);
+    if (!res.ok) throw new Error('Server returned ' + res.status);
+    const json = await res.json();
+    if (json && json.error) throw new Error(json.error);
+    return json;
+  }
+
+  async function testConnection(url){
+    const prev = API_URL;
+    API_URL = url;
+    try{
+      const rows = await apiCall('listCompanies');
+      return { ok:true, rows };
+    } finally {
+      API_URL = prev;
+    }
+  }
+
+  // ---------------- Persistence (mapped onto the sheet-backed API) ----------------
+  const dbLoadAllCompanies   = () => apiCall('listCompanies');
+  const dbSaveCompany        = (co) => apiCall('saveCompany', null, co);
+  const dbDeleteCompany      = (id) => apiCall('deleteCompany', null, {id});
+  const dbLoadStaffForCompany= (companyId) => apiCall('listStaff', {companyId});
+  const dbSaveStaff          = (staff) => apiCall('saveStaff', null, staff);
+  const dbDeleteStaff        = (companyId, id) => apiCall('deleteStaff', null, {id});
+  const dbSavePayslipRaw     = (companyId, staffId, year, month, data) => apiCall('savePayslip', null, {companyId, staffId, year, month, data});
+
+  async function dbGetPayslip(companyId, staffId, year, month){
+    const key = companyId+':'+staffId+':'+year+'-'+month;
+    if (key in payslipCache) return payslipCache[key];
+    const r = await apiCall('getPayslip', {staffId, year, month});
+    const val = (r && r.data) ? r.data : null;
+    payslipCache[key] = val;
+    return val;
+  }
+  async function dbSavePayslip(companyId, staffId, year, month, data){
+    await dbSavePayslipRaw(companyId, staffId, year, month, data);
+    payslipCache[companyId+':'+staffId+':'+year+'-'+month] = data;
+  }
+  async function dbListStaffHistory(companyId, staffId){
+    const cacheKey = companyId+':'+staffId;
+    if (staffHistoryCache[cacheKey]) return staffHistoryCache[cacheKey];
+    const rows = await apiCall('listPayslips', {staffId});
+    const periods = (rows||[]).map(r=>({year: parseInt(r.year), month: parseInt(r.month)}))
+      .sort((a,b)=> (b.year-a.year) || (b.month-a.month));
+    staffHistoryCache[cacheKey] = periods;
+    return periods;
+  }
+
+  // ---------------- Calculation ----------------
+  function calcStatutory(profile, pay){
+    const basic = parseFloat(pay.basicSalary)||0;
+    const dailyAttendance = parseFloat(pay.dailyAttendance)||0;
+    const meal = parseFloat(pay.meal)||0;
+    const nightShift = parseFloat(pay.nightShift)||0;
+    const bonus = parseFloat(pay.bonus)||0;
+    const normalOT = parseFloat(pay.normalOT)||0;
+    const restOT = parseFloat(pay.restOT)||0;
+    const earlyOut = parseFloat(pay.earlyOut)||0;
+    const lateness = parseFloat(pay.lateness)||0;
+    const timeOff = parseFloat(pay.timeOff)||0;
+    const unpaidLeave = parseFloat(pay.unpaidLeave)||0;
+    const pcb = parseFloat(pay.pcb)||0;
+    const otherDeduct = parseFloat(pay.otherDeduct)||0;
+
+    const statutoryWage = Math.max(basic + meal + nightShift - unpaidLeave, 0);
+    const socsoWage = Math.min(statutoryWage, 6000);
+    const eisWage = socsoWage;
+
+    const over60 = profile.empAge === 'over60';
+    const foreign = profile.empStatus === 'foreign';
+
+    let epfEmployeeRate, epfEmployerRate;
+    if (over60){ epfEmployeeRate = 0; epfEmployerRate = 0.04; }
+    else if (foreign){ epfEmployeeRate = 0.02; epfEmployerRate = 0.02; }
+    else { epfEmployeeRate = 0.11; epfEmployerRate = statutoryWage <= 5000 ? 0.13 : 0.12; }
+
+    const epfEmployee = Math.round(statutoryWage * epfEmployeeRate * 100)/100;
+    const epfEmployer = Math.round(statutoryWage * epfEmployerRate * 100)/100;
+
+    let socsoEmployee, socsoEmployer;
+    if (over60){ socsoEmployee = 0; socsoEmployer = Math.round(socsoWage * 0.0125 * 100)/100; }
+    else { socsoEmployee = Math.round(socsoWage * 0.005 * 100)/100; socsoEmployer = Math.round(socsoWage * 0.0175 * 100)/100; }
+
+    let eisEmployee = 0, eisEmployer = 0;
+    if (!over60 && !foreign){ eisEmployee = Math.round(eisWage * 0.002 * 100)/100; eisEmployer = Math.round(eisWage * 0.002 * 100)/100; }
+
+    const earnings = [
+      ['BASIC PAY', basic],
+      dailyAttendance ? ['DAILY ATTENDANCE', dailyAttendance] : null,
+      meal ? ['MEAL', meal] : null,
+      nightShift ? ['NIGHT SHIFT ALLOWANCE', nightShift] : null,
+      normalOT ? ['NORMAL OT', normalOT] : null,
+      restOT ? ['REST OT', restOT] : null,
+      bonus ? ['BONUS / COMMISSION', bonus] : null,
+    ].filter(Boolean);
+    const totalEarnings = earnings.reduce((s,r)=>s+r[1],0);
+
+    const deductions = [
+      ['EMPLOYEE EPF', epfEmployee],
+      ['EMPLOYEE SOCSO', socsoEmployee],
+      eisEmployee ? ['EMPLOYEE EIS', eisEmployee] : null,
+      pcb ? ['EMPLOYEE PCB', pcb] : null,
+      earlyOut ? ['EARLY OUT', earlyOut] : null,
+      lateness ? ['LATENESS', lateness] : null,
+      timeOff ? ['TIME OFF', timeOff] : null,
+      unpaidLeave ? ['UNPAID LEAVE', unpaidLeave] : null,
+      otherDeduct ? ['OTHER DEDUCTION', otherDeduct] : null,
+    ].filter(Boolean);
+    const totalDeductions = deductions.reduce((s,r)=>s+r[1],0);
+
+    const netSalary = totalEarnings - totalDeductions;
+    const employerCost = totalEarnings + epfEmployer + socsoEmployer + eisEmployer;
+
+    return { earnings, deductions, totalEarnings, totalDeductions, netSalary, epfEmployer, socsoEmployer, eisEmployer, employerCost };
+  }
+
+  // ---------------- Payslip markup ----------------
+  function buildPayslipHTML(company, profile, period, calc, opts){
+    opts = opts || {};
+    const refs = (company.companyRefs||'').trim();
+    const addrLine = [(company.companyAddr||'').trim(), refs?('Ref: '+refs):''].filter(Boolean).join(' · ');
+    return `
+      <div class="ps-topbox">
+        <div>
+          <div class="ps-company">${esc(company.companyName)||'Company Name'}</div>
+          <div style="font-size:11.5px; color:#555; margin-top:3px;">${esc(addrLine)}</div>
+        </div>
+        <div>
+          <div class="ps-period">END PAYMENT&nbsp;&nbsp;-&nbsp;&nbsp;${MONTHS[period.month]} ${period.year}</div>
+          ${opts.dirty ? '<div class="ps-draft">Unsaved changes</div>' : ''}
+        </div>
+      </div>
+      <div class="ps-idbox">
+        <div class="left">
+          <div><span class="lbl">NAME :</span>${esc(profile.empName)||'—'}</div>
+          <div><span class="lbl">NRIC :</span>${esc(profile.empIC)||'—'}</div>
+        </div>
+        <div class="right">
+          <div><span class="lbl">EMPLOYEE NO :</span>${esc(profile.empNo)||'—'}</div>
+          <div><span class="lbl">POSITION :</span>${esc(profile.empPosition)||'—'}</div>
+        </div>
+      </div>
+      <div class="ps-cols">
+        <div class="ps-col left">
+          <div class="ps-col-head">Earnings</div>
+          <div class="ps-col-body">${calc.earnings.map(r=>`<div class="ps-line"><span class="l">${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('')}</div>
+        </div>
+        <div class="ps-col">
+          <div class="ps-col-head">Deductions</div>
+          <div class="ps-col-body">${calc.deductions.map(r=>`<div class="ps-line"><span class="l">${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('')}</div>
+        </div>
+      </div>
+      <div class="ps-totals-row">
+        <div class="ps-totals-cell left"><span>TOTAL EARNINGS</span><span>${fmt(calc.totalEarnings)}</span></div>
+        <div class="ps-totals-cell"><span>TOTAL DEDUCTIONS</span><span>${fmt(calc.totalDeductions)}</span></div>
+      </div>
+      <div class="ps-employer-row">
+        <div class="ps-employer-cell">
+          <div class="ps-line"><span class="l">EMPLOYER EPF</span><span>${fmt(calc.epfEmployer)}</span></div>
+          <div class="ps-line"><span class="l">EMPLOYER SOCSO</span><span>${fmt(calc.socsoEmployer)}</span></div>
+          <div class="ps-line"><span class="l">EMPLOYER EIS</span><span>${fmt(calc.eisEmployer)}</span></div>
+        </div>
+        <div class="ps-net-cell"><span class="l">NET SALARY</span><span class="v">${fmt(calc.netSalary)}</span></div>
+      </div>
+      <div class="ps-sign">
+        <div>CHECKED BY :<div class="line"></div></div>
+        <div>APPROVED BY :<div class="line"></div></div>
+        <div>RECEIVED BY :<div class="line"></div></div>
+      </div>
+    `;
+  }
+
+  // ---------------- Rendering: companies ----------------
+  function renderCompanyList(){
+    const wrap = document.getElementById('coList');
+    wrap.innerHTML = '';
+    companies.forEach(co=>{
+      const chip = document.createElement('div');
+      chip.className = 'co-chip' + (co.id===currentCompanyId ? ' active':'');
+      chip.innerHTML = `<span>${esc(co.companyName)||'Untitled'}</span><span class="x">✕</span>`;
+      chip.querySelector('span:first-child').addEventListener('click', ()=>selectCompany(co.id));
+      chip.querySelector('.x').addEventListener('click', (e)=>{ e.stopPropagation(); confirmDeleteCompany(co.id); });
+      wrap.appendChild(chip);
+    });
+  }
+
+  async function selectCompany(id){
+    currentCompanyId = id;
+    const co = companies.find(c=>c.id===id);
+    if (!co) return;
+    document.getElementById('companyFieldset').style.display='block';
+    document.getElementById('companyLegend').textContent = 'Company details';
+    document.getElementById('companyName').value = co.companyName||'';
+    document.getElementById('companyAddr').value = co.companyAddr||'';
+    document.getElementById('companyRefs').value = co.companyRefs||'';
+    renderCompanyList();
+
+    document.getElementById('staffDirFieldset').style.display='block';
+    currentStaffId = null;
+    document.getElementById('profileFieldset').style.display='none';
+    document.getElementById('periodFieldset').style.display='none';
+    document.getElementById('payFieldset').style.display='none';
+    document.getElementById('printAllBtn').disabled = true;
+
+    try{
+      staffList = await dbLoadStaffForCompany(id);
+    }catch(e){ toast('Could not load staff: ' + e.message, true); staffList = []; }
+    renderStaffList();
+    document.getElementById('placeholderView').style.display='block';
+    document.getElementById('payslipContainer').innerHTML = '';
+    document.getElementById('toolbarSub').textContent = `${co.companyName||'Company'} — select or add a staff member`;
+    document.getElementById('printAllBtn').disabled = staffList.length===0;
+  }
+
+  function confirmDeleteCompany(id){
+    const co = companies.find(c=>c.id===id);
+    if (!confirm(`Delete "${co ? co.companyName : 'this company'}" and ALL its staff and payslips? This cannot be undone.`)) return;
+    deleteCompany(id);
+  }
+  async function deleteCompany(id){
+    try{ await dbDeleteCompany(id); }catch(e){ toast('Delete failed: ' + e.message, true); return; }
+    companies = companies.filter(c=>c.id!==id);
+    if (currentCompanyId===id){
+      currentCompanyId = null; staffList=[]; currentStaffId=null;
+      document.getElementById('companyFieldset').style.display='none';
+      document.getElementById('staffDirFieldset').style.display='none';
+      document.getElementById('profileFieldset').style.display='none';
+      document.getElementById('periodFieldset').style.display='none';
+      document.getElementById('payFieldset').style.display='none';
+      document.getElementById('placeholderView').style.display='block';
+      document.getElementById('payslipContainer').innerHTML='';
+      document.getElementById('printAllBtn').disabled = true;
+      document.getElementById('toolbarSub').textContent = 'Add a company to get started';
+    }
+    renderCompanyList();
+    toast('Company deleted');
+    if (companies.length>0 && !currentCompanyId) await selectCompany(companies[0].id);
+  }
+
+  document.getElementById('addCompanyBtn').addEventListener('click', ()=>{
+    currentCompanyId = null;
+    document.getElementById('companyFieldset').style.display='block';
+    document.getElementById('companyLegend').textContent = 'New company';
+    document.getElementById('companyName').value='';
+    document.getElementById('companyAddr').value='';
+    document.getElementById('companyRefs').value='';
+    document.getElementById('staffDirFieldset').style.display='none';
+    document.getElementById('profileFieldset').style.display='none';
+    document.getElementById('periodFieldset').style.display='none';
+    document.getElementById('payFieldset').style.display='none';
+    renderCompanyList();
+    document.getElementById('companyName').focus();
+  });
+
+  document.getElementById('saveCompanyBtn').addEventListener('click', async ()=>{
+    const data = {
+      companyName: document.getElementById('companyName').value.trim(),
+      companyAddr: document.getElementById('companyAddr').value.trim(),
+      companyRefs: document.getElementById('companyRefs').value.trim(),
+    };
+    if (!data.companyName){ alert('Please enter the company name.'); return; }
+    try{
+      if (currentCompanyId){
+        const idx = companies.findIndex(c=>c.id===currentCompanyId);
+        const saved = await dbSaveCompany(Object.assign({id: currentCompanyId}, data));
+        companies[idx] = saved;
+        toast('Company updated');
+        renderCompanyList();
+        renderPayslip();
+      } else {
+        const saved = await dbSaveCompany(data);
+        companies.push(saved);
+        toast('Company added');
+        await selectCompany(saved.id);
+      }
+    }catch(e){ toast('Save failed: ' + e.message, true); }
+  });
+  document.getElementById('deleteCompanyBtn').addEventListener('click', ()=>{ if(currentCompanyId) confirmDeleteCompany(currentCompanyId); });
+
+  // ---------------- Rendering: staff ----------------
+  function renderStaffList(){
+    const list = document.getElementById('staffList');
+    const empty = document.getElementById('staffEmpty');
+    list.innerHTML = '';
+    if (staffList.length === 0){ empty.style.display='block'; return; }
+    empty.style.display='none';
+    staffList.forEach(staff=>{
+      const item = document.createElement('div');
+      item.className = 'staff-item' + (staff.id===currentStaffId ? ' active':'');
+      item.innerHTML = `<div><div class="staff-name">${esc(staff.empName||'Unnamed')}</div><div class="staff-role">${esc(staff.empPosition||'')}</div></div><span class="x" title="Delete staff">✕</span>`;
+      item.addEventListener('click', (e)=>{
+        if (e.target.classList.contains('x')){ e.stopPropagation(); confirmDeleteStaff(staff.id); }
+        else { selectStaff(staff.id); }
+      });
+      list.appendChild(item);
+    });
+  }
+
+  function readProfileForm(){
+    return {
+      empName: document.getElementById('empName').value.trim(),
+      empNo: document.getElementById('empNo').value.trim(),
+      empIC: document.getElementById('empIC').value.trim(),
+      empPosition: document.getElementById('empPosition').value.trim(),
+      empStatus: document.getElementById('empStatus').value,
+      empAge: document.getElementById('empAge').value,
+    };
+  }
+  function readPayForm(){
+    const o = {};
+    PAY_FIELDS.forEach(id=>{ o[id] = document.getElementById(id).value; });
+    return o;
+  }
+  function fillProfileForm(staff){
+    document.getElementById('empName').value = staff.empName||'';
+    document.getElementById('empNo').value = staff.empNo||'';
+    document.getElementById('empIC').value = staff.empIC||'';
+    document.getElementById('empPosition').value = staff.empPosition||'';
+    document.getElementById('empStatus').value = staff.empStatus||'citizen';
+    document.getElementById('empAge').value = staff.empAge||'under60';
+  }
+  function fillPayForm(pay){
+    PAY_FIELDS.forEach(id=>{ document.getElementById(id).value = pay ? (pay[id]||'') : ''; });
+  }
+
+  async function selectStaff(id){
+    currentStaffId = id;
+    const staff = staffList.find(s=>s.id===id);
+    if (!staff) return;
+    document.getElementById('profileFieldset').style.display='block';
+    document.getElementById('periodFieldset').style.display='block';
+    document.getElementById('payFieldset').style.display='block';
+    document.getElementById('profileLegend').textContent = 'Staff profile';
+    fillProfileForm(staff);
+    renderStaffList();
+    await loadPeriod();
+  }
+
+  async function loadPeriod(){
+    if (!currentStaffId) return;
+    currentYear = parseInt(document.getElementById('payYear').value)||new Date().getFullYear();
+    currentMonth = parseInt(monthSel.value);
+    try{
+      const pay = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth);
+      fillPayForm(pay);
+    }catch(e){ toast('Could not load payslip: ' + e.message, true); fillPayForm(null); }
+    isDirty = false;
+    await renderHistoryChips();
+    renderPayslip();
+  }
+
+  async function renderHistoryChips(){
+    const wrap = document.getElementById('historyList');
+    if (!currentStaffId){ wrap.innerHTML=''; return; }
+    let history = [];
+    try{ history = await dbListStaffHistory(currentCompanyId, currentStaffId); }catch(e){}
+    if (history.length===0){ wrap.innerHTML = '<div class="empty-note">No saved payslips yet for this staff.</div>'; return; }
+    wrap.innerHTML = '<div style="font-size:10px; color:#8a97a2; margin:10px 0 6px;">Saved months</div>';
+    history.forEach(p=>{
+      const chip = document.createElement('span');
+      const isCurrent = p.year===currentYear && p.month===currentMonth;
+      chip.className = 'history-chip' + (isCurrent?' current':'');
+      chip.textContent = `${titleCase(MONTHS[p.month]).slice(0,3)} ${p.year}`;
+      chip.addEventListener('click', ()=>{
+        document.getElementById('payYear').value = p.year;
+        monthSel.value = p.month;
+        loadPeriod();
+      });
+      wrap.appendChild(chip);
+    });
+  }
+
+  function markDirty(){ isDirty = true; renderPayslip(); }
+
+  function renderPayslip(){
+    const container = document.getElementById('payslipContainer');
+    if (!currentStaffId || !currentCompanyId){
+      document.getElementById('placeholderView').style.display='block';
+      container.innerHTML=''; return;
+    }
+    const staff = staffList.find(s=>s.id===currentStaffId);
+    const co = companies.find(c=>c.id===currentCompanyId);
+    if (!staff || !co) return;
+    const profile = readProfileForm();
+    const pay = readPayForm();
+    const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
+    if (!hasAnyPay){
+      document.getElementById('placeholderView').style.display='block';
+      container.innerHTML=''; return;
+    }
+    document.getElementById('placeholderView').style.display='none';
+    const calc = calcStatutory(profile, pay);
+    document.getElementById('toolbarSub').textContent = `${co.companyName||'Company'} · ${profile.empName||'Employee'} — ${titleCase(MONTHS[currentMonth])} ${currentYear}`;
+    const div = document.createElement('div');
+    div.className = 'payslip';
+    div.innerHTML = buildPayslipHTML(co, profile, {year: currentYear, month: currentMonth}, calc, {dirty:isDirty});
+    container.innerHTML = '';
+    container.appendChild(div);
+  }
+
+  // ---------------- Actions: staff ----------------
+  document.getElementById('addStaffBtn').addEventListener('click', ()=>{
+    currentStaffId = null;
+    document.getElementById('profileFieldset').style.display='block';
+    document.getElementById('periodFieldset').style.display='none';
+    document.getElementById('payFieldset').style.display='none';
+    document.getElementById('profileLegend').textContent = 'New staff profile';
+    fillProfileForm({});
+    document.getElementById('placeholderView').style.display='block';
+    document.getElementById('payslipContainer').innerHTML='';
+    renderStaffList();
+    document.getElementById('empName').focus();
+  });
+
+  document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
+    const profile = readProfileForm();
+    if (!profile.empName){ alert('Please enter the staff name before saving.'); return; }
+    try{
+      if (currentStaffId){
+        const idx = staffList.findIndex(s=>s.id===currentStaffId);
+        const saved = await dbSaveStaff(Object.assign({id: currentStaffId, companyId: currentCompanyId}, profile));
+        staffList[idx] = saved;
+        toast('Profile updated');
+      } else {
+        const saved = await dbSaveStaff(Object.assign({companyId: currentCompanyId}, profile));
+        staffList.push(saved);
+        currentStaffId = saved.id;
+        toast('New staff added');
+      }
+    }catch(e){ toast('Save failed: ' + e.message, true); return; }
+    renderStaffList();
+    document.getElementById('periodFieldset').style.display='block';
+    document.getElementById('payFieldset').style.display='block';
+    document.getElementById('printAllBtn').disabled = staffList.length===0;
+    await loadPeriod();
+  });
+
+  function confirmDeleteStaff(id){
+    const staff = staffList.find(s=>s.id===id);
+    if (!confirm(`Delete ${staff ? staff.empName : 'this staff'} and all their saved payslips?`)) return;
+    deleteStaffFn(id);
+  }
+  async function deleteStaffFn(id){
+    try{ await dbDeleteStaff(currentCompanyId, id); }catch(e){ toast('Delete failed: ' + e.message, true); return; }
+    staffList = staffList.filter(s=>s.id!==id);
+    delete staffHistoryCache[currentCompanyId+':'+id];
+    if (currentStaffId===id){
+      currentStaffId = null;
+      document.getElementById('profileFieldset').style.display='none';
+      document.getElementById('periodFieldset').style.display='none';
+      document.getElementById('payFieldset').style.display='none';
+      document.getElementById('placeholderView').style.display='block';
+      document.getElementById('payslipContainer').innerHTML='';
+    }
+    document.getElementById('printAllBtn').disabled = staffList.length===0;
+    renderStaffList();
+    toast('Staff deleted');
+  }
+  document.getElementById('deleteStaffBtn').addEventListener('click', ()=>{ if(currentStaffId) confirmDeleteStaff(currentStaffId); });
+
+  document.getElementById('savePayslipBtn').addEventListener('click', async ()=>{
+    if (!currentStaffId){ alert('Please add and save a staff profile first.'); return; }
+    const pay = readPayForm();
+    try{
+      await dbSavePayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, pay);
+    }catch(e){ toast('Save failed: ' + e.message, true); return; }
+    delete staffHistoryCache[currentCompanyId+':'+currentStaffId];
+    isDirty = false;
+    await renderHistoryChips();
+    renderPayslip();
+    toast(`Payslip saved for ${titleCase(MONTHS[currentMonth])} ${currentYear}`);
+  });
+
+  document.getElementById('sameAsLastBtn').addEventListener('click', async ()=>{
+    if (!currentStaffId) return;
+    let py = currentMonth - 1, yy = currentYear;
+    if (py < 0){ py = 11; yy -= 1; }
+    let prev;
+    try{ prev = await dbGetPayslip(currentCompanyId, currentStaffId, yy, py); }catch(e){ toast('Lookup failed: ' + e.message, true); return; }
+    if (!prev){ toast(`No saved payslip found for ${titleCase(MONTHS[py])} ${yy}`); return; }
+    fillPayForm(prev);
+    markDirty();
+    toast(`Copied figures from ${titleCase(MONTHS[py])} ${yy} — remember to save`);
+  });
+
+  document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+
+  document.getElementById('printAllBtn').addEventListener('click', async ()=>{
+    if (!currentCompanyId || staffList.length===0) return;
+    const co = companies.find(c=>c.id===currentCompanyId);
+    const year = parseInt(document.getElementById('payYear').value)||currentYear;
+    const month = parseInt(monthSel.value);
+    const batch = document.getElementById('batchPrintArea');
+    batch.innerHTML = '';
+    let count = 0;
+    for (const staff of staffList){
+      let pay;
+      try{ pay = await dbGetPayslip(currentCompanyId, staff.id, year, month); }catch(e){ continue; }
+      if (!pay) continue;
+      const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
+      if (!hasAnyPay) continue;
+      const calc = calcStatutory(staff, pay);
+      const div = document.createElement('div');
+      div.className = 'payslip batch-only';
+      div.innerHTML = buildPayslipHTML(co, staff, {year, month}, calc, {});
+      batch.appendChild(div);
+      count++;
+    }
+    if (count===0){ toast(`No saved payslips found for ${titleCase(MONTHS[month])} ${year} at this company`); return; }
+    document.body.classList.add('batch-mode');
+    window.print();
+    toast(`Printing ${count} payslip${count>1?'s':''} for ${titleCase(MONTHS[month])} ${year}`);
+  });
+  window.addEventListener('afterprint', ()=>{ document.body.classList.remove('batch-mode'); });
+
+  monthSel.addEventListener('change', loadPeriod);
+  document.getElementById('payYear').addEventListener('change', loadPeriod);
+  ['empName','empNo','empIC','empPosition','empStatus','empAge'].forEach(id=>document.getElementById(id).addEventListener('input', renderPayslip));
+  PAY_FIELDS.forEach(id=>document.getElementById(id).addEventListener('input', markDirty));
+
+  // ---------------- Connection flow ----------------
+  async function connectWith(url){
+    const btn = document.getElementById('gateConnectBtn');
+    const errBox = document.getElementById('gateError');
+    errBox.style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Connecting…';
+    try{
+      const test = await testConnection(url);
+      API_URL = url;
+      saveUrl(url);
+      setConnBadge('ok', 'Connected to Google Sheet');
+      document.getElementById('gateView').style.display = 'none';
+      document.getElementById('appPanels').style.display = 'block';
+      document.getElementById('toolbar').style.display = 'flex';
+      companies = test.rows || [];
+      renderCompanyList();
+      if (companies.length > 0) await selectCompany(companies[0].id);
+      else { document.getElementById('placeholderView').style.display='block'; }
+      toast('Connected! Your payroll data will now sync to your Google Sheet.');
+    }catch(e){
+      errBox.textContent = 'Could not connect: ' + e.message + '. Double-check the URL and that the deployment access is set to "Anyone".';
+      errBox.style.display = 'block';
+      setConnBadge('err', 'Connection failed');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Connect';
+    }
+  }
+
+  document.getElementById('gateConnectBtn').addEventListener('click', ()=>{
+    const url = document.getElementById('gateUrlInput').value.trim();
+    if (!url){ document.getElementById('gateError').textContent='Please paste your Apps Script Web App URL.'; document.getElementById('gateError').style.display='block'; return; }
+    connectWith(url);
+  });
+  document.getElementById('gateUrlInput').addEventListener('keydown', (e)=>{ if (e.key==='Enter') document.getElementById('gateConnectBtn').click(); });
+
+  document.getElementById('connManageBtn').addEventListener('click', ()=>{
+    document.getElementById('appPanels').style.display = 'none';
+    document.getElementById('toolbar').style.display = 'none';
+    document.getElementById('placeholderView').style.display = 'none';
+    document.getElementById('payslipContainer').innerHTML = '';
+    document.getElementById('gateView').style.display = 'block';
+    document.getElementById('gateUrlInput').value = API_URL || '';
+  });
+
+  document.getElementById('gateDownloadLink').addEventListener('click', (e)=>{
+    e.preventDefault();
+    toast('Download it from the file Claude shared alongside this app: gaji-sheets-backend.gs');
+  });
+
+  // ---------------- Boot ----------------
+  async function boot(){
+    const saved = getSavedUrl();
+    if (saved){
+      document.getElementById('gateUrlInput').value = saved;
+      setConnBadge('off', 'Reconnecting…');
+      await connectWith(saved);
+    } else {
+      setConnBadge('off', 'Not connected');
+    }
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
