@@ -181,6 +181,32 @@
   .toast.err{ background:#5c261c; }
 
   #batchPrintArea{ display:none; }
+  #duoPrintArea{ display:none; }
+
+  /* ---- 2-up A4 print layout ---- */
+  @page{ size:A4; margin:9mm; }
+  .print-page{ display:flex; flex-direction:column; gap:0; }
+  .payslip.compact{ font-size:.86em; margin-bottom:0; }
+  .payslip.compact .ps-topbox{ padding:10px 16px; }
+  .payslip.compact .ps-company{ font-size:15px; }
+  .payslip.compact .ps-period{ font-size:11.5px; }
+  .payslip.compact .ps-idbox{ padding:8px 16px; font-size:11px; }
+  .payslip.compact .ps-idbox .lbl{ width:76px; }
+  .payslip.compact .ps-idbox .right .lbl{ width:86px; }
+  .payslip.compact .ps-col-head{ padding:5px 0; font-size:10.5px; }
+  .payslip.compact .ps-col-body{ padding:6px 14px; min-height:70px; }
+  .payslip.compact .ps-line{ font-size:10.5px; padding:2.5px 0; }
+  .payslip.compact .ps-totals-cell{ padding:6px 16px; font-size:10.5px; }
+  .payslip.compact .ps-employer-cell{ padding:6px 16px; }
+  .payslip.compact .ps-employer-cell .ps-line{ font-size:9.5px; }
+  .payslip.compact .ps-net-cell{ padding:6px 16px; }
+  .payslip.compact .ps-net-cell .l{ font-size:11px; }
+  .payslip.compact .ps-net-cell .v{ font-size:13px; }
+  .payslip.compact .ps-sign{ padding:10px 16px 8px; font-size:9.5px; gap:12px; }
+  .payslip.compact .ps-sign .line{ margin-top:14px; }
+  .copy-label{ text-align:center; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:#888; padding:4px 0; }
+  .cut-line{ position:relative; text-align:center; margin:2mm 0; border-top:1px dashed #999; }
+  .cut-line span{ position:absolute; top:-7px; left:50%; transform:translateX(-50%); background:#fff; padding:0 8px; font-size:8.5px; color:#999; letter-spacing:1px; }
 
   @media print{
     body{ background:#fff; }
@@ -189,11 +215,13 @@
     .payslip{ box-shadow:none; max-width:100%; margin-bottom:0; }
     .report-card{ box-shadow:none; border-top:none; max-width:100%; padding:0; }
     .report-head .toolbar-actions{ display:none !important; }
-    body:not(.batch-mode) .payslip.batch-only{ display:none !important; }
-    body.batch-mode .main > .payslip:not(.batch-only), body.batch-mode .placeholder{ display:none !important; }
+    body:not(.batch-mode):not(.duo-mode) .payslip.batch-only{ display:none !important; }
+    body.batch-mode .main > .payslip:not(.batch-only), body.batch-mode .placeholder,
+    body.duo-mode .main > .payslip:not(.batch-only), body.duo-mode .placeholder{ display:none !important; }
     body.batch-mode #batchPrintArea{ display:block; }
-    body.batch-mode #batchPrintArea .payslip{ page-break-after: always; }
-    body.batch-mode #batchPrintArea .payslip:last-child{ page-break-after: auto; }
+    body.duo-mode #duoPrintArea{ display:block; }
+    .print-page{ page-break-after: always; }
+    .print-page:last-child{ page-break-after: auto; }
   }
   @media (max-width: 900px){
     .app{ grid-template-columns:1fr; }
@@ -422,6 +450,7 @@
 </div>
 
 <div id="batchPrintArea"></div>
+<div id="duoPrintArea"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1008,7 +1037,27 @@
     openEditPay();
   });
 
-  document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+  document.getElementById('printBtn').addEventListener('click', ()=>{
+    const staff = staffList.find(s=>s.id===currentStaffId);
+    const co = companies.find(c=>c.id===currentCompanyId);
+    if (!staff || !co){ window.print(); return; }
+    const pay = readPayForm();
+    const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
+    if (!hasAnyPay){ window.print(); return; }
+    const calc = calcStatutory(staff, pay, co, {year: currentYear, month: currentMonth});
+    const html = buildPayslipHTML(co, staff, {year: currentYear, month: currentMonth}, calc, {dirty:isDirty});
+    document.getElementById('duoPrintArea').innerHTML = `
+      <div class="print-page">
+        <div class="copy-label">Employee copy</div>
+        <div class="payslip compact">${html}</div>
+        <div class="cut-line"><span>✂ cut here</span></div>
+        <div class="copy-label">Office copy</div>
+        <div class="payslip compact">${html}</div>
+      </div>`;
+    document.body.classList.add('duo-mode');
+    window.print();
+  });
+  window.addEventListener('afterprint', ()=>{ document.body.classList.remove('duo-mode'); });
 
   document.getElementById('printAllBtn').addEventListener('click', async ()=>{
     if (!currentCompanyId || staffList.length===0) return;
@@ -1017,7 +1066,7 @@
     const month = parseInt(monthSel.value);
     const batch = document.getElementById('batchPrintArea');
     batch.innerHTML = '';
-    let count = 0;
+    const slips = [];
     for (const staff of staffList){
       let pay;
       try{ pay = await dbGetPayslip(currentCompanyId, staff.id, year, month); }catch(e){ continue; }
@@ -1025,16 +1074,20 @@
       const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
       if (!hasAnyPay) continue;
       const calc = calcStatutory(staff, pay, co, {year, month});
-      const div = document.createElement('div');
-      div.className = 'payslip batch-only';
-      div.innerHTML = buildPayslipHTML(co, staff, {year, month}, calc, {});
-      batch.appendChild(div);
-      count++;
+      slips.push(buildPayslipHTML(co, staff, {year, month}, calc, {}));
     }
-    if (count===0){ toast(`No saved payslips found for ${titleCase(MONTHS[month])} ${year} at this company`); return; }
+    if (slips.length===0){ toast(`No saved payslips found for ${titleCase(MONTHS[month])} ${year} at this company`); return; }
+    for (let i=0; i<slips.length; i+=2){
+      const page = document.createElement('div');
+      page.className = 'print-page batch-only';
+      let inner = `<div class="payslip compact batch-only">${slips[i]}</div>`;
+      if (slips[i+1]) inner += `<div class="cut-line"><span>✂ cut here</span></div><div class="payslip compact batch-only">${slips[i+1]}</div>`;
+      page.innerHTML = inner;
+      batch.appendChild(page);
+    }
     document.body.classList.add('batch-mode');
     window.print();
-    toast(`Printing ${count} payslip${count>1?'s':''} for ${titleCase(MONTHS[month])} ${year}`);
+    toast(`Printing ${slips.length} payslip${slips.length>1?'s':''} (2 per page) for ${titleCase(MONTHS[month])} ${year}`);
   });
   window.addEventListener('afterprint', ()=>{ document.body.classList.remove('batch-mode'); });
 
