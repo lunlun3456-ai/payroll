@@ -107,32 +107,41 @@
 
   /* ---- payslip: bordered-box template style ---- */
   .payslip{ width:100%; max-width:800px; background:#fff; box-shadow: var(--shadow); border:2px solid #111; margin-bottom:20px; font-family: Arial, Helvetica, sans-serif; }
-  .ps-topbox{ display:flex; justify-content:space-between; padding:18px 24px; border-bottom:2px solid #111; }
+  .ps-topbox{ display:flex; justify-content:space-between; align-items:center; padding:14px 24px; border-bottom:2px solid #111; }
   .ps-company{ font-size:19px; font-weight:700; color:#111; }
   .ps-period{ font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; text-align:right; }
-  .ps-idbox{ display:flex; justify-content:space-between; padding:14px 24px; border-bottom:2px solid #111; font-size:12.5px; }
-  .ps-idbox .left, .ps-idbox .right{ line-height:1.9; }
-  .ps-idbox .lbl{ display:inline-block; width:90px; color:#333; font-weight:600; }
-  .ps-idbox .right .lbl{ width:100px; }
+  .ps-idbox2{ display:grid; grid-template-columns:1fr 1fr; padding:10px 24px; border-bottom:2px solid #111; font-size:12px; }
+  .ps-id-col div{ display:flex; padding:2px 0; }
+  .ps-id-col .lbl{ width:118px; flex-shrink:0; color:#333; font-weight:700; }
+  .ps-attend-row{ display:flex; justify-content:space-between; align-items:flex-end; padding:10px 24px; border-bottom:2px solid #111; font-size:12px; gap:24px; flex-wrap:wrap; }
+  .attend-left{ display:flex; flex-direction:column; gap:4px; }
+  .attend-line{ display:flex; gap:34px; }
+  .attend-line .lbl{ width:110px; font-weight:700; color:#333; }
+  table.attend-table{ border-collapse:collapse; font-size:11px; }
+  table.attend-table th, table.attend-table td{ padding:2px 12px; text-align:center; }
+  table.attend-table th{ font-weight:700; border-bottom:1px solid #999; }
   .ps-cols{ display:grid; grid-template-columns:1fr 1fr; }
   .ps-col{ padding:0; }
   .ps-col.left{ border-right:2px solid #111; }
-  .ps-col-head{ font-size:12.5px; font-weight:700; text-align:center; text-transform:uppercase; padding:9px 0; border-bottom:2px solid #111; letter-spacing:.5px; }
+  .ps-col-head{ font-size:12.5px; font-weight:700; text-transform:uppercase; padding:9px 20px; border-bottom:2px solid #111; letter-spacing:.5px; }
   .ps-col-body{ padding:10px 20px; min-height:120px; }
   .ps-line{ display:flex; justify-content:space-between; font-size:12.5px; padding:5px 0; }
   .ps-line .l{ text-transform:uppercase; letter-spacing:.2px; }
   .ps-totals-row{ display:grid; grid-template-columns:1fr 1fr; border-top:2px solid #111; }
   .ps-totals-cell{ padding:10px 20px; font-size:12.5px; font-weight:700; display:flex; justify-content:space-between; text-transform:uppercase; }
   .ps-totals-cell.left{ border-right:2px solid #111; }
-  .ps-employer-row{ display:grid; grid-template-columns:1fr 1fr; border-top:2px solid #111; }
-  .ps-employer-cell{ padding:10px 20px; border-right:2px solid #111; }
-  .ps-employer-cell .ps-line{ font-size:12px; }
-  .ps-net-cell{ padding:10px 20px; display:flex; align-items:center; justify-content:space-between; }
-  .ps-net-cell .l{ font-size:13.5px; font-weight:700; text-transform:uppercase; }
-  .ps-net-cell .v{ font-size:17px; font-weight:700; color:var(--green); }
-  .ps-sign{ display:flex; justify-content:space-between; padding:26px 24px 20px; border-top:2px solid #111; font-size:12px; gap:20px; }
-  .ps-sign div{ flex:1; }
-  .ps-sign .line{ border-bottom:1px solid #111; margin-top:26px; }
+  .ps-netpay-row{ display:grid; grid-template-columns:1fr 1fr; border-top:1px solid #111; }
+  .ps-netpay-row .blank{ border-right:2px solid #111; }
+  .ps-netpay-row .val-cell{ padding:10px 20px; display:flex; justify-content:space-between; font-weight:700; font-size:14px; text-transform:uppercase; color:var(--green); }
+  .ps-bottom-row{ display:flex; justify-content:space-between; align-items:flex-start; padding:16px 24px; gap:30px; flex-wrap:wrap; border-top:2px solid #111; }
+  .ps-eyer-box{ border:1.5px solid #111; padding:8px 16px; min-width:220px; }
+  .ps-eyer-box .ps-line{ font-size:12px; }
+  .ps-ytd-box{ font-size:12px; padding-top:4px; }
+  .ps-ytd-box .ps-line{ justify-content:flex-start; gap:16px; }
+  .ps-ytd-box .l{ width:60px; }
+  .ps-sign2{ display:flex; justify-content:space-between; padding:24px 24px 18px; border-top:2px solid #111; font-size:12px; gap:30px; }
+  .ps-sign2 div{ flex:1; }
+  .ps-sign2 .line{ border-bottom:1px solid #111; margin-top:26px; }
   .ps-draft{ font-size:10px; color:var(--red); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
   .ps-edit-hint{ width:100%; max-width:800px; display:flex; justify-content:flex-end; margin:-10px 0 14px; }
   .ps-edit-hint button{ background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:8px 14px; border-radius:7px; font-size:12.5px; cursor:pointer; font-family:inherit; }
@@ -187,23 +196,25 @@
   @page{ size:A4; margin:9mm; }
   .print-page{ display:flex; flex-direction:column; gap:0; }
   .payslip.compact{ font-size:.86em; margin-bottom:0; }
-  .payslip.compact .ps-topbox{ padding:10px 16px; }
-  .payslip.compact .ps-company{ font-size:15px; }
-  .payslip.compact .ps-period{ font-size:11.5px; }
-  .payslip.compact .ps-idbox{ padding:8px 16px; font-size:11px; }
-  .payslip.compact .ps-idbox .lbl{ width:76px; }
-  .payslip.compact .ps-idbox .right .lbl{ width:86px; }
-  .payslip.compact .ps-col-head{ padding:5px 0; font-size:10.5px; }
-  .payslip.compact .ps-col-body{ padding:6px 14px; min-height:70px; }
-  .payslip.compact .ps-line{ font-size:10.5px; padding:2.5px 0; }
-  .payslip.compact .ps-totals-cell{ padding:6px 16px; font-size:10.5px; }
-  .payslip.compact .ps-employer-cell{ padding:6px 16px; }
-  .payslip.compact .ps-employer-cell .ps-line{ font-size:9.5px; }
-  .payslip.compact .ps-net-cell{ padding:6px 16px; }
-  .payslip.compact .ps-net-cell .l{ font-size:11px; }
-  .payslip.compact .ps-net-cell .v{ font-size:13px; }
-  .payslip.compact .ps-sign{ padding:10px 16px 8px; font-size:9.5px; gap:12px; }
-  .payslip.compact .ps-sign .line{ margin-top:14px; }
+  .payslip.compact .ps-topbox{ padding:8px 14px; }
+  .payslip.compact .ps-company{ font-size:14px; }
+  .payslip.compact .ps-period{ font-size:11px; }
+  .payslip.compact .ps-idbox2{ padding:6px 14px; font-size:10px; }
+  .payslip.compact .ps-id-col .lbl{ width:92px; }
+  .payslip.compact .ps-attend-row{ padding:6px 14px; font-size:10px; }
+  .payslip.compact .attend-line .lbl{ width:88px; }
+  .payslip.compact table.attend-table{ font-size:9.5px; }
+  .payslip.compact .ps-col-head{ padding:5px 14px; font-size:10px; }
+  .payslip.compact .ps-col-body{ padding:6px 14px; min-height:60px; }
+  .payslip.compact .ps-line{ font-size:9.5px; padding:2px 0; }
+  .payslip.compact .ps-totals-cell{ padding:5px 14px; font-size:9.5px; }
+  .payslip.compact .ps-netpay-row .val-cell{ padding:5px 14px; font-size:11px; }
+  .payslip.compact .ps-bottom-row{ padding:8px 14px; }
+  .payslip.compact .ps-eyer-box{ padding:5px 12px; min-width:170px; }
+  .payslip.compact .ps-eyer-box .ps-line{ font-size:9px; }
+  .payslip.compact .ps-ytd-box{ font-size:9px; }
+  .payslip.compact .ps-sign2{ padding:8px 14px 6px; font-size:9px; gap:12px; }
+  .payslip.compact .ps-sign2 .line{ margin-top:12px; }
   .copy-label{ text-align:center; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:#888; padding:4px 0; }
   .cut-line{ position:relative; text-align:center; margin:2mm 0; border-top:1px dashed #999; }
   .cut-line span{ position:absolute; top:-7px; left:50%; transform:translateX(-50%); background:#fff; padding:0 8px; font-size:8.5px; color:#999; letter-spacing:1px; }
@@ -227,9 +238,12 @@
     .app{ grid-template-columns:1fr; }
     .sidebar{ order:2; }
     .main{ padding:22px 14px 40px; }
-    .ps-cols, .ps-totals-row, .ps-employer-row{ grid-template-columns:1fr; }
-    .ps-col.left, .ps-totals-cell.left, .ps-employer-cell{ border-right:none; border-bottom:2px solid #111; }
-    .ps-sign{ flex-direction:column; }
+    .ps-cols, .ps-totals-row, .ps-netpay-row{ grid-template-columns:1fr; }
+    .ps-col.left, .ps-totals-cell.left, .ps-netpay-row .blank{ border-right:none; border-bottom:2px solid #111; }
+    .ps-idbox2{ grid-template-columns:1fr; }
+    .ps-attend-row{ flex-direction:column; align-items:flex-start; }
+    .ps-bottom-row{ flex-direction:column; }
+    .ps-sign2{ flex-direction:column; }
     .gate, .form-card{ padding:26px 20px; }
     .fc-grid2, .fc-grid3{ grid-template-columns:1fr; gap:16px; }
   }
@@ -317,7 +331,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbzm4QgGzlPSg1b0IpFdNepkftHpvXshDn-iw1-hydMm_HyvQZix-LkXUp59AdroY4_F/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -374,6 +388,11 @@
           <select class="fc-select" id="empAge"><option value="under60">Below 60</option><option value="over60">60 and above</option></select>
         </div>
       </div>
+      <div class="fc-grid3">
+        <div class="fc-group"><label class="fc-label">EPF no.</label><input type="text" class="fc-input" id="empEpfNo" placeholder="12345677899"></div>
+        <div class="fc-group"><label class="fc-label">SOCSO no.</label><input type="text" class="fc-input" id="empSocsoNo" placeholder="123456789"></div>
+        <div class="fc-group"><label class="fc-label">Tax no.</label><input type="text" class="fc-input" id="empTaxNo" placeholder="123456789"></div>
+      </div>
       <div class="fc-actions">
         <button class="fc-btn primary" id="saveProfileBtn">Save profile</button>
         <button class="fc-btn ghost" id="cancelStaffBtn">Cancel</button>
@@ -386,8 +405,21 @@
       <h2 id="payFormTitle">This month's pay</h2>
       <div class="fc-sub" id="payFormSub">Enter salary details for the selected pay period.</div>
 
-      <div class="fc-section-title first">Earnings</div>
-      <div class="fc-group"><label class="fc-label">Basic pay (RM)</label><input type="number" class="fc-input" id="basicSalary" placeholder="0.00" step="0.01"></div>
+      <div class="fc-section-title first">Base rate &amp; attendance</div>
+      <div class="fc-grid3">
+        <div class="fc-group"><label class="fc-label">Base rate / monthly salary (RM)</label><input type="number" class="fc-input" id="basicSalary" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Working days in month</label><input type="number" class="fc-input" id="workingDays" placeholder="31" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Days worked (DW)</label><input type="number" class="fc-input" id="daysWorked" placeholder="31" step="0.01"></div>
+      </div>
+      <div class="fc-sub" style="margin:-10px 0 18px; font-size:12px;">If Days Worked is less than Working Days, Basic Pay is prorated: <i>Base Rate ÷ Working Days × Days Worked</i> (Calendar Days Method) — for mid-month joiners/leavers.</div>
+      <div class="fc-grid3">
+        <div class="fc-group"><label class="fc-label">Early out — EO (hours)</label><input type="number" class="fc-input" id="eoHours" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Lateness — LAT (hours)</label><input type="number" class="fc-input" id="latHours" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Time off — TOF (hours)</label><input type="number" class="fc-input" id="tofHours" placeholder="0.00" step="0.01"></div>
+      </div>
+      <div class="fc-sub" style="margin:-10px 0 18px; font-size:12px;">EO/LAT/TOF are converted to a deduction using the hourly rate (Base Rate ÷ Working Days ÷ 8).</div>
+
+      <div class="fc-section-title">Earnings</div>
       <div class="fc-grid3">
         <div class="fc-group"><label class="fc-label">Daily attendance (RM)</label><input type="number" class="fc-input" id="dailyAttendance" placeholder="0.00" step="0.01"></div>
         <div class="fc-group"><label class="fc-label">Meal (RM)</label><input type="number" class="fc-input" id="meal" placeholder="0.00" step="0.01"></div>
@@ -396,19 +428,25 @@
       <div class="fc-grid3">
         <div class="fc-group"><label class="fc-label">Normal OT (RM)</label><input type="number" class="fc-input" id="normalOT" placeholder="0.00" step="0.01"></div>
         <div class="fc-group"><label class="fc-label">Rest day OT (RM)</label><input type="number" class="fc-input" id="restOT" placeholder="0.00" step="0.01"></div>
-        <div class="fc-group"><label class="fc-label">Bonus / commission (RM)</label><input type="number" class="fc-input" id="bonus" placeholder="0.00" step="0.01"></div>
+        <div class="fc-group"><label class="fc-label">Commission (RM)</label><input type="number" class="fc-input" id="commission" placeholder="0.00" step="0.01"></div>
       </div>
+      <div class="fc-group"><label class="fc-label">Bonus (RM)</label><input type="number" class="fc-input" id="bonus" placeholder="0.00" step="0.01"></div>
 
       <div class="fc-section-title">Other deductions</div>
-      <div class="fc-grid3">
-        <div class="fc-group"><label class="fc-label">Early out (RM)</label><input type="number" class="fc-input" id="earlyOut" placeholder="0.00" step="0.01"></div>
-        <div class="fc-group"><label class="fc-label">Lateness (RM)</label><input type="number" class="fc-input" id="lateness" placeholder="0.00" step="0.01"></div>
-        <div class="fc-group"><label class="fc-label">Time off (RM)</label><input type="number" class="fc-input" id="timeOff" placeholder="0.00" step="0.01"></div>
-      </div>
       <div class="fc-grid3">
         <div class="fc-group"><label class="fc-label">Unpaid leave (RM)</label><input type="number" class="fc-input" id="unpaidLeave" placeholder="0.00" step="0.01"></div>
         <div class="fc-group"><label class="fc-label">PCB / MTD tax (RM)</label><input type="number" class="fc-input" id="pcb" placeholder="0.00" step="0.01"></div>
         <div class="fc-group"><label class="fc-label">Other deduction (RM)</label><input type="number" class="fc-input" id="otherDeduct" placeholder="0.00" step="0.01"></div>
+      </div>
+
+      <div class="fc-section-title">YTD leave (for reference on payslip)</div>
+      <div class="fc-grid2">
+        <div class="fc-group"><label class="fc-label">YTD annual leave — days [balance]</label>
+          <div class="row2"><input type="number" class="fc-input" id="ytdAlDays" placeholder="2.50" step="0.01"><input type="number" class="fc-input" id="ytdAlBracket" placeholder="0.00" step="0.01"></div>
+        </div>
+        <div class="fc-group"><label class="fc-label">YTD medical leave — days [balance]</label>
+          <div class="row2"><input type="number" class="fc-input" id="ytdMcDays" placeholder="0.00" step="0.01"><input type="number" class="fc-input" id="ytdMcBracket" placeholder="14.00" step="0.01"></div>
+        </div>
       </div>
 
       <div class="fc-actions">
@@ -460,7 +498,8 @@
   const monthSel = document.getElementById('payMonth');
   MONTHS.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=titleCase(m); monthSel.appendChild(o); });
 
-  const PAY_FIELDS = ['basicSalary','dailyAttendance','meal','nightShift','bonus','normalOT','restOT','earlyOut','lateness','timeOff','unpaidLeave','pcb','otherDeduct'];
+  const PAY_FIELDS = ['basicSalary','workingDays','daysWorked','eoHours','latHours','tofHours','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','otherDeduct','ytdAlDays','ytdAlBracket','ytdMcDays','ytdMcBracket'];
+  const AMOUNT_FIELDS = ['basicSalary','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','otherDeduct'];
   const LS_KEY = 'gaji_apps_script_url';
 
   let API_URL = null;
@@ -576,21 +615,36 @@
   function calcStatutory(profile, pay, company, period){
     company = company || {};
     period = period || { year: currentYear, month: currentMonth };
-    const basic = parseFloat(pay.basicSalary)||0;
+
+    const baseRate = parseFloat(pay.basicSalary)||0;
+    const workingDays = parseFloat(pay.workingDays)||0;
+    const daysWorkedRaw = pay.daysWorked;
+    const daysWorked = (daysWorkedRaw !== undefined && daysWorkedRaw !== '' && daysWorkedRaw !== null) ? parseFloat(daysWorkedRaw) : workingDays;
+    const dailyRate = workingDays > 0 ? baseRate / workingDays : 0;
+    const hourlyRate = dailyRate / 8;
+    // Calendar Days Method: Monthly Salary ÷ Total Days in Month × Days Worked
+    const isProrated = workingDays > 0 && daysWorked < workingDays;
+    const basic = isProrated ? Math.round(dailyRate * daysWorked * 100)/100 : baseRate;
+
+    const eoHours = parseFloat(pay.eoHours)||0;
+    const latHours = parseFloat(pay.latHours)||0;
+    const tofHours = parseFloat(pay.tofHours)||0;
+    const earlyOut = Math.round(hourlyRate * eoHours * 100)/100;
+    const lateness = Math.round(hourlyRate * latHours * 100)/100;
+    const timeOff = Math.round(hourlyRate * tofHours * 100)/100;
+
     const dailyAttendance = parseFloat(pay.dailyAttendance)||0;
     const meal = parseFloat(pay.meal)||0;
     const nightShift = parseFloat(pay.nightShift)||0;
-    const bonus = parseFloat(pay.bonus)||0;
     const normalOT = parseFloat(pay.normalOT)||0;
     const restOT = parseFloat(pay.restOT)||0;
-    const earlyOut = parseFloat(pay.earlyOut)||0;
-    const lateness = parseFloat(pay.lateness)||0;
-    const timeOff = parseFloat(pay.timeOff)||0;
+    const commission = parseFloat(pay.commission)||0;
+    const bonus = parseFloat(pay.bonus)||0;
     const unpaidLeave = parseFloat(pay.unpaidLeave)||0;
     const pcb = parseFloat(pay.pcb)||0;
     const otherDeduct = parseFloat(pay.otherDeduct)||0;
 
-    const statutoryWage = Math.max(basic + meal + nightShift - unpaidLeave, 0);
+    const statutoryWage = Math.max(basic + meal + nightShift + commission - unpaidLeave, 0);
     const socsoWage = Math.min(statutoryWage, 6000);
     const eisWage = socsoWage;
 
@@ -622,7 +676,8 @@
       nightShift ? ['NIGHT SHIFT ALLOWANCE', nightShift] : null,
       normalOT ? ['NORMAL OT', normalOT] : null,
       restOT ? ['REST OT', restOT] : null,
-      bonus ? ['BONUS / COMMISSION', bonus] : null,
+      commission ? ['COMMISSION', commission] : null,
+      bonus ? ['BONUS', bonus] : null,
     ].filter(Boolean);
     const totalEarnings = earnings.reduce((s,r)=>s+r[1],0);
 
@@ -646,59 +701,78 @@
     const employerCost = totalEarnings + epfEmployer + socsoEmployer + eisEmployer + hrdfLevy;
 
     return { earnings, deductions, totalEarnings, totalDeductions, netSalary, epfEmployer, socsoEmployer, eisEmployer, hrdfLevy, employerCost,
-      epfEmployee, socsoEmployee, eisEmployee, pcb, lindungAmount };
+      epfEmployee, socsoEmployee, eisEmployee, pcb, lindungAmount,
+      baseRate, workingDays, daysWorked, eoHours, latHours, tofHours, isProrated,
+      ytdAlDays: pay.ytdAlDays, ytdAlBracket: pay.ytdAlBracket, ytdMcDays: pay.ytdMcDays, ytdMcBracket: pay.ytdMcBracket };
   }
 
   function buildPayslipHTML(company, profile, period, calc, opts){
     opts = opts || {};
     const refs = (company.companyRefs||'').trim();
-    const addrLine = [(company.companyAddr||'').trim(), refs?('Ref: '+refs):''].filter(Boolean).join(' · ');
+    const fmtDays = (n) => (parseFloat(n)||0).toFixed(2);
     return `
       <div class="ps-topbox">
-        <div>
-          <div class="ps-company">${esc(company.companyName)||'Company Name'}</div>
-          <div style="font-size:11.5px; color:#555; margin-top:3px;">${esc(addrLine)}</div>
-        </div>
+        <div class="ps-company">${esc(company.companyName)||'Company Name'}</div>
         <div>
           <div class="ps-period">END PAYMENT&nbsp;&nbsp;-&nbsp;&nbsp;${MONTHS[period.month]} ${period.year}</div>
           ${opts.dirty ? '<div class="ps-draft">Unsaved changes</div>' : ''}
         </div>
       </div>
-      <div class="ps-idbox">
-        <div class="left">
-          <div><span class="lbl">NAME :</span>${esc(profile.empName)||'—'}</div>
-          <div><span class="lbl">NRIC :</span>${esc(profile.empIC)||'—'}</div>
+      <div class="ps-idbox2">
+        <div class="ps-id-col">
+          <div><span class="lbl">EMPLOYEE NO.</span>${esc(profile.empNo)||'—'}</div>
+          <div><span class="lbl">NAME</span>${esc(profile.empName)||'—'}</div>
+          <div><span class="lbl">IC NO.</span>${esc(profile.empIC)||'—'}</div>
+          <div><span class="lbl">DEPARTMENT</span>${esc(profile.empDept)||'—'}</div>
         </div>
-        <div class="right">
-          <div><span class="lbl">EMPLOYEE NO :</span>${esc(profile.empNo)||'—'}</div>
-          <div><span class="lbl">POSITION :</span>${esc(profile.empPosition)||'—'}</div>
+        <div class="ps-id-col">
+          <div><span class="lbl">POSITION</span>${esc(profile.empPosition)||'—'}</div>
+          <div><span class="lbl">EPF NO.</span>${esc(profile.empEpfNo)||'—'}</div>
+          <div><span class="lbl">SOCSO NO.</span>${esc(profile.empSocsoNo)||'—'}</div>
+          <div><span class="lbl">TAX NO.</span>${esc(profile.empTaxNo)||'—'}</div>
         </div>
+      </div>
+      <div class="ps-attend-row">
+        <div class="attend-left">
+          <div class="attend-line"><span class="lbl">BASE RATE</span><span>${fmt(calc.baseRate)}</span></div>
+          <div class="attend-line"><span class="lbl">WORKING DAYS</span><span>${fmtDays(calc.workingDays)}</span></div>
+        </div>
+        <table class="attend-table">
+          <tr><th>DW</th><th>EO</th><th>LAT</th><th>TOF</th></tr>
+          <tr><td>${fmtDays(calc.daysWorked)}</td><td>${fmtDays(calc.eoHours)}</td><td>${fmtDays(calc.latHours)}</td><td>${fmtDays(calc.tofHours)}</td></tr>
+        </table>
       </div>
       <div class="ps-cols">
         <div class="ps-col left">
-          <div class="ps-col-head">Earnings</div>
+          <div class="ps-col-head">Earnings / Income</div>
           <div class="ps-col-body">${calc.earnings.map(r=>`<div class="ps-line"><span class="l">${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('')}</div>
         </div>
         <div class="ps-col">
-          <div class="ps-col-head">Deductions</div>
+          <div class="ps-col-head">Deduction</div>
           <div class="ps-col-body">${calc.deductions.map(r=>`<div class="ps-line"><span class="l">${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('')}</div>
         </div>
       </div>
       <div class="ps-totals-row">
-        <div class="ps-totals-cell left"><span>TOTAL EARNINGS</span><span>${fmt(calc.totalEarnings)}</span></div>
-        <div class="ps-totals-cell"><span>TOTAL DEDUCTIONS</span><span>${fmt(calc.totalDeductions)}</span></div>
+        <div class="ps-totals-cell left"><span>GROSS PAY</span><span>${fmt(calc.totalEarnings)}</span></div>
+        <div class="ps-totals-cell"><span>TOTAL DEDUCTION</span><span>${fmt(calc.totalDeductions)}</span></div>
       </div>
-      <div class="ps-employer-row">
-        <div class="ps-employer-cell">
-          <div class="ps-line"><span class="l">EMPLOYER EPF</span><span>${fmt(calc.epfEmployer)}</span></div>
-          <div class="ps-line"><span class="l">EMPLOYER SOCSO</span><span>${fmt(calc.socsoEmployer)}</span></div>
-          <div class="ps-line"><span class="l">EMPLOYER EIS</span><span>${fmt(calc.eisEmployer)}</span></div>
-          ${calc.hrdfLevy ? `<div class="ps-line"><span class="l">HRDF LEVY (1%)</span><span>${fmt(calc.hrdfLevy)}</span></div>` : ''}
+      <div class="ps-netpay-row">
+        <div class="blank"></div>
+        <div class="val-cell"><span>NET PAY</span><span>${fmt(calc.netSalary)}</span></div>
+      </div>
+      <div class="ps-bottom-row">
+        <div class="ps-eyer-box">
+          <div class="ps-line"><span class="l">EPF (E'YER)</span><span>${fmt(calc.epfEmployer)}</span></div>
+          <div class="ps-line"><span class="l">SOCSO (E'YER)</span><span>${fmt(calc.socsoEmployer)}</span></div>
+          <div class="ps-line"><span class="l">EIS (E'YER)</span><span>${fmt(calc.eisEmployer)}</span></div>
+          ${calc.hrdfLevy ? `<div class="ps-line"><span class="l">HRDF (E'YER)</span><span>${fmt(calc.hrdfLevy)}</span></div>` : ''}
         </div>
-        <div class="ps-net-cell"><span class="l">NET SALARY</span><span class="v">${fmt(calc.netSalary)}</span></div>
+        <div class="ps-ytd-box">
+          <div class="ps-line"><span class="l">YTD AL</span><span>${fmtDays(calc.ytdAlDays)} DAYS&nbsp;&nbsp;[ ${fmtDays(calc.ytdAlBracket)}]</span></div>
+          <div class="ps-line"><span class="l">YTD MC</span><span>${fmtDays(calc.ytdMcDays)} DAYS&nbsp;&nbsp;[ ${fmtDays(calc.ytdMcBracket)}]</span></div>
+        </div>
       </div>
-      <div class="ps-sign">
-        <div>CHECKED BY :<div class="line"></div></div>
+      <div class="ps-sign2">
         <div>APPROVED BY :<div class="line"></div></div>
         <div>RECEIVED BY :<div class="line"></div></div>
       </div>
@@ -838,6 +912,9 @@
       empDept: document.getElementById('empDept').value.trim(),
       empStatus: document.getElementById('empStatus').value,
       empAge: document.getElementById('empAge').value,
+      empEpfNo: document.getElementById('empEpfNo').value.trim(),
+      empSocsoNo: document.getElementById('empSocsoNo').value.trim(),
+      empTaxNo: document.getElementById('empTaxNo').value.trim(),
     };
   }
   function readPayForm(){
@@ -853,6 +930,9 @@
     document.getElementById('empDept').value = staff.empDept||'';
     document.getElementById('empStatus').value = staff.empStatus||'citizen';
     document.getElementById('empAge').value = staff.empAge||'under60';
+    document.getElementById('empEpfNo').value = staff.empEpfNo||'';
+    document.getElementById('empSocsoNo').value = staff.empSocsoNo||'';
+    document.getElementById('empTaxNo').value = staff.empTaxNo||'';
   }
   function fillPayForm(pay){
     PAY_FIELDS.forEach(id=>{ document.getElementById(id).value = pay ? (pay[id]||'') : ''; });
@@ -876,6 +956,11 @@
     try{
       const pay = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth);
       fillPayForm(pay);
+      if (!pay){
+        const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+        document.getElementById('workingDays').value = daysInMonth;
+        document.getElementById('daysWorked').value = daysInMonth;
+      }
     }catch(e){ toast('Could not load payslip: ' + e.message, true); fillPayForm(null); }
     isDirty = false;
     await renderHistoryChips();
@@ -917,7 +1002,7 @@
     const co = companies.find(c=>c.id===currentCompanyId);
     if (!staff || !co) return;
     const pay = readPayForm();
-    const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
+    const hasAnyPay = AMOUNT_FIELDS.some(k=>parseFloat(pay[k])>0);
     if (!hasAnyPay){
       document.getElementById('placeholderView').style.display='block';
       document.getElementById('psEditHint').style.display='none';
@@ -1042,7 +1127,7 @@
     const co = companies.find(c=>c.id===currentCompanyId);
     if (!staff || !co){ window.print(); return; }
     const pay = readPayForm();
-    const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
+    const hasAnyPay = AMOUNT_FIELDS.some(k=>parseFloat(pay[k])>0);
     if (!hasAnyPay){ window.print(); return; }
     const calc = calcStatutory(staff, pay, co, {year: currentYear, month: currentMonth});
     const html = buildPayslipHTML(co, staff, {year: currentYear, month: currentMonth}, calc, {dirty:isDirty});
@@ -1071,7 +1156,7 @@
       let pay;
       try{ pay = await dbGetPayslip(currentCompanyId, staff.id, year, month); }catch(e){ continue; }
       if (!pay) continue;
-      const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
+      const hasAnyPay = AMOUNT_FIELDS.some(k=>parseFloat(pay[k])>0);
       if (!hasAnyPay) continue;
       const calc = calcStatutory(staff, pay, co, {year, month});
       slips.push(buildPayslipHTML(co, staff, {year, month}, calc, {}));
@@ -1110,7 +1195,7 @@
       let pay;
       try{ pay = await dbGetPayslip(currentCompanyId, staff.id, currentYear, currentMonth); }catch(e){ pay = null; }
       if (!pay) continue;
-      const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
+      const hasAnyPay = AMOUNT_FIELDS.some(k=>parseFloat(pay[k])>0);
       if (!hasAnyPay) continue;
       const calc = calcStatutory(staff, pay, co, {year: currentYear, month: currentMonth});
       rows.push({ staff, calc });
@@ -1162,7 +1247,7 @@
       let pay;
       try{ pay = await dbGetPayslip(currentCompanyId, staff.id, currentYear, m); }catch(e){ pay = null; }
       if (!pay) continue;
-      const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
+      const hasAnyPay = AMOUNT_FIELDS.some(k=>parseFloat(pay[k])>0);
       if (!hasAnyPay) continue;
       const calc = calcStatutory(staff, pay, co, {year: currentYear, month: m});
       months.push({ m, calc });
