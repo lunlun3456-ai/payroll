@@ -256,7 +256,7 @@
       <div class="nav-section">
         <div class="nav-title">PERKESO references</div>
         <div class="ref-links">
-          Approximates First Category under <b>Act 4</b> (Employment Injury + Invalidity) &amp; <b>Act 800</b> (EIS). Age 60+ and LINDUNG 24 Jam (from June 2026) are being phased in — confirm exact sen directly:<br>
+          Approximates First Category under <b>Act 4</b> (Employment Injury + Invalidity) &amp; <b>Act 800</b> (EIS). <b>LINDUNG 24 Jam</b> is fully employee-borne, phased in from June 2026: 0.75% (first 2 years) → 1.00% (next 3 years) → 1.25% (year 6 onwards) — applied automatically based on payslip date. Age 60+ and exact bracket tables should still be confirmed directly:<br>
           • <a href="https://www.perkeso.gov.my/en/our-services/employer-employee/contribution-calculator.html" target="_blank">Official calculator</a><br>
           • <a href="https://www.perkeso.gov.my/en/our-services/employer-employee/kadar-caruman.html" target="_blank">Contribution rate page</a><br>
           • <a href="https://www.perkeso.gov.my/en/our-services/protection/lindung-24-jam.html" target="_blank">LINDUNG 24 Jam scheme</a>
@@ -289,7 +289,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbzKTLiwItalss4QdMJ4hJc5S6EYCljNtbNVZShml7cDQHzz2GjGWU_FB95H_sMkJ0Uy/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -531,8 +531,22 @@
   }
 
   // ---------------- Calculation ----------------
-  function calcStatutory(profile, pay, company){
+  // LINDUNG 24 Jam: fully employee-borne, phased in from scheme start (June 2026)
+  // Phase 1: 0.75% (first 2 years) · Phase 2: 1.00% (next 3 years) · Phase 3: 1.25% (year 6 onwards)
+  const LINDUNG_START = new Date(2026, 5, 1); // June 2026
+  function lindungRate(year, month){
+    const current = new Date(year, month, 1);
+    const diffMonths = (current.getFullYear()-LINDUNG_START.getFullYear())*12 + (current.getMonth()-LINDUNG_START.getMonth());
+    if (diffMonths < 0) return 0;
+    const yearsElapsed = diffMonths / 12;
+    if (yearsElapsed < 2) return 0.0075;
+    if (yearsElapsed < 5) return 0.01;
+    return 0.0125;
+  }
+
+  function calcStatutory(profile, pay, company, period){
     company = company || {};
+    period = period || { year: currentYear, month: currentMonth };
     const basic = parseFloat(pay.basicSalary)||0;
     const dailyAttendance = parseFloat(pay.dailyAttendance)||0;
     const meal = parseFloat(pay.meal)||0;
@@ -569,6 +583,9 @@
     let eisEmployee = 0, eisEmployer = 0;
     if (!over60 && !foreign){ eisEmployee = Math.round(eisWage * 0.002 * 100)/100; eisEmployer = Math.round(eisWage * 0.002 * 100)/100; }
 
+    const lRate = over60 ? 0 : lindungRate(period.year, period.month);
+    const lindungAmount = Math.round(socsoWage * lRate * 100)/100;
+
     const earnings = [
       ['BASIC PAY', basic],
       dailyAttendance ? ['DAILY ATTENDANCE', dailyAttendance] : null,
@@ -584,6 +601,7 @@
       ['EMPLOYEE EPF', epfEmployee],
       ['EMPLOYEE SOCSO', socsoEmployee],
       eisEmployee ? ['EMPLOYEE EIS', eisEmployee] : null,
+      lindungAmount ? [`LINDUNG 24 JAM (${(lRate*100).toFixed(2)}%)`, lindungAmount] : null,
       pcb ? ['EMPLOYEE PCB', pcb] : null,
       earlyOut ? ['EARLY OUT', earlyOut] : null,
       lateness ? ['LATENESS', lateness] : null,
@@ -599,7 +617,7 @@
     const employerCost = totalEarnings + epfEmployer + socsoEmployer + eisEmployer + hrdfLevy;
 
     return { earnings, deductions, totalEarnings, totalDeductions, netSalary, epfEmployer, socsoEmployer, eisEmployer, hrdfLevy, employerCost,
-      epfEmployee, socsoEmployee, eisEmployee, pcb };
+      epfEmployee, socsoEmployee, eisEmployee, pcb, lindungAmount };
   }
 
   function buildPayslipHTML(company, profile, period, calc, opts){
@@ -878,7 +896,7 @@
     }
     document.getElementById('placeholderView').style.display='none';
     document.getElementById('psEditHint').style.display='flex';
-    const calc = calcStatutory(staff, pay, co);
+    const calc = calcStatutory(staff, pay, co, {year: currentYear, month: currentMonth});
     document.getElementById('toolbarSub').textContent = `${co.companyName||'Company'} · ${staff.empName||'Employee'} — ${titleCase(MONTHS[currentMonth])} ${currentYear}`;
     const div = document.createElement('div');
     div.className = 'payslip';
@@ -1006,7 +1024,7 @@
       if (!pay) continue;
       const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
       if (!hasAnyPay) continue;
-      const calc = calcStatutory(staff, pay, co);
+      const calc = calcStatutory(staff, pay, co, {year, month});
       const div = document.createElement('div');
       div.className = 'payslip batch-only';
       div.innerHTML = buildPayslipHTML(co, staff, {year, month}, calc, {});
@@ -1041,7 +1059,7 @@
       if (!pay) continue;
       const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
       if (!hasAnyPay) continue;
-      const calc = calcStatutory(staff, pay, co);
+      const calc = calcStatutory(staff, pay, co, {year: currentYear, month: currentMonth});
       rows.push({ staff, calc });
     }
     if (rows.length === 0){
@@ -1093,7 +1111,7 @@
       if (!pay) continue;
       const hasAnyPay = PAY_FIELDS.some(k=>parseFloat(pay[k])>0);
       if (!hasAnyPay) continue;
-      const calc = calcStatutory(staff, pay, co);
+      const calc = calcStatutory(staff, pay, co, {year: currentYear, month: m});
       months.push({ m, calc });
     }
     if (months.length === 0){
