@@ -134,7 +134,7 @@
   .ps-bottom-row{ display:grid; grid-template-columns:1fr 1fr; gap:0 30px; font-size:12.5px; padding:3px 0; }
   .ps-bottom-row.strong{ font-weight:700; }
   .ps-bottom-row .bl{ display:flex; justify-content:space-between; }
-  .ps-empsign{ margin-top:26px; padding-top:16px; border-top:1px solid #111; font-size:12px; display:flex; justify-content:flex-end; align-items:flex-end; gap:14px; }
+  .ps-empsign{ margin-top:36px; padding-top:20px; padding-right:6px; border-top:1px solid #111; font-size:12px; display:flex; justify-content:flex-end; align-items:flex-end; gap:18px; }
   .ps-empsign .sign-line{ width:200px; flex:none; border-bottom:1px solid #111; height:20px; }
   .ps-edit-hint{ width:100%; max-width:800px; display:flex; justify-content:flex-end; margin:-10px 0 14px; }
   .ps-edit-hint button{ background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:8px 14px; border-radius:7px; font-size:12.5px; cursor:pointer; font-family:inherit; }
@@ -343,7 +343,8 @@
       </div>
       <div class="toolbar-actions">
         <button class="btn-outline" id="printAllBtn" disabled>Print all payslips (this month)</button>
-        <button class="btn-outline" id="printBtn">Print / Save PDF</button>
+        <button class="btn-outline" id="printBtn">🖨️ Print</button>
+        <button class="btn-outline" id="savePdfBtn">💾 Save as PDF</button>
       </div>
     </div>
 
@@ -1336,6 +1337,10 @@
     showView('pay');
   });
 
+  function variantLabel(name, month, idx){
+    return `${name}(${titleCase(MONTHS[month])})-${idx}`;
+  }
+
   function printDuo(topHtml, bottomHtml, topLabel, bottomLabel){
     document.getElementById('duoPrintArea').innerHTML = `
       <div class="print-page">
@@ -1349,7 +1354,7 @@
     window.print();
   }
 
-  document.getElementById('printBtn').addEventListener('click', async ()=>{
+  async function runPrintCurrent(){
     const staff = staffList.find(s=>s.id===currentStaffId);
     const co = companies.find(c=>c.id===currentCompanyId);
     if (!staff || !co){ window.print(); return; }
@@ -1374,8 +1379,7 @@
       } else {
         const htmlA = buildPayslipHTML(co, staff, period, calcA, {});
         const htmlB = buildPayslipHTML(co, staff, period, calcB, {});
-        const monthLabel = titleCase(MONTHS[currentMonth]);
-        printDuo(htmlA, htmlB, `Payslip ${monthLabel}-0`, `Payslip ${monthLabel}-1`);
+        printDuo(htmlA, htmlB, variantLabel(staff.empName, currentMonth, 0), variantLabel(staff.empName, currentMonth, 1));
       }
       return;
     }
@@ -1387,6 +1391,12 @@
     const calc = calcStatutory(staff, only, co, period);
     const html = buildPayslipHTML(co, staff, period, calc, {dirty: (!hasA && !hasB) ? isDirty : false});
     printDuo(html, html, 'Employee copy', 'Office copy');
+  }
+
+  document.getElementById('printBtn').addEventListener('click', runPrintCurrent);
+  document.getElementById('savePdfBtn').addEventListener('click', async ()=>{
+    toast('In the dialog that opens, set Destination to "Save as PDF"');
+    await runPrintCurrent();
   });
   window.addEventListener('afterprint', ()=>{ document.body.classList.remove('duo-mode'); });
 
@@ -1418,8 +1428,8 @@
         if (sameAmount){
           slips.push({label:'', html: buildPayslipHTML(co, staff, period, calcB, {})});
         } else {
-          slips.push({label:`${staff.empName} — Payslip A`, html: buildPayslipHTML(co, staff, period, calcA, {})});
-          slips.push({label:`${staff.empName} — Payslip B`, html: buildPayslipHTML(co, staff, period, calcB, {})});
+          slips.push({label: variantLabel(staff.empName, month, 0), html: buildPayslipHTML(co, staff, period, calcA, {})});
+          slips.push({label: variantLabel(staff.empName, month, 1), html: buildPayslipHTML(co, staff, period, calcB, {})});
         }
       } else {
         const only = hasA ? payA : payB;
