@@ -178,6 +178,11 @@
   .placeholder h2{ font-family:"Iowan Old Style","Georgia",serif; color:var(--ink); margin-bottom:8px; }
 
   /* ---- connection gate ---- */
+  .lock-screen{ position:fixed; inset:0; background:var(--ink); display:flex; align-items:center; justify-content:center; z-index:1000; }
+  .lock-card{ width:100%; max-width:340px; background:#182b3f; border-radius:12px; border-top:5px solid var(--gold); padding:32px 30px; box-shadow:0 20px 60px rgba(0,0,0,.4); }
+  .lock-card .fc-input{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); color:#fff; }
+  .lock-card .fc-input::placeholder{ color:#8a97a2; }
+
   .gate{ width:100%; max-width:560px; background:var(--panel); border-radius:12px; box-shadow:var(--shadow); border-top:5px solid var(--gold); padding:40px 40px 34px; }
   .gate h2{ font-family:"Iowan Old Style","Georgia",serif; font-size:22px; margin:0 0 6px; }
   .gate p{ font-size:13.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 22px; }
@@ -230,7 +235,7 @@
   @media print{
     *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
     body{ background:#fff; }
-    .sidebar, .toolbar, .toast, .ps-edit-hint{ display:none !important; }
+    .sidebar, .toolbar, .toast, .ps-edit-hint, .lock-screen{ display:none !important; }
     .main{ padding:0; }
     .payslip{ box-shadow:none; max-width:100%; margin-bottom:0; }
     .report-card{ box-shadow:none; border-top:none; max-width:100%; padding:0; }
@@ -257,6 +262,19 @@
 </style>
 </head>
 <body>
+<div id="lockScreen" class="lock-screen">
+  <div class="lock-card">
+    <div class="brand" style="margin-bottom:6px;"><span class="brand-mark" style="color:var(--gold);">Gaji</span><span class="brand-sub" style="color:#9fb0bf;">Payroll System MY</span></div>
+    <p style="font-size:13px; color:var(--ink-soft); margin:0 0 20px;">This tool is password-protected. Enter the password to continue.</p>
+    <input type="password" id="lockPasswordInput" placeholder="Password" class="fc-input" style="margin-bottom:12px;">
+    <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft); margin-bottom:16px;">
+      <input type="checkbox" id="lockRemember" checked style="width:16px; height:16px; accent-color:#b8863c;"> Remember me on this device
+    </label>
+    <button class="gate-connect-btn" id="lockUnlockBtn" style="width:100%;">Unlock</button>
+    <div class="gate-error" id="lockError">Incorrect password.</div>
+  </div>
+</div>
+
 <div class="app">
 
   <!-- ============ SIDEBAR — navigation only ============ -->
@@ -269,6 +287,7 @@
       <span id="connText">Not connected</span>
       <button id="connManageBtn">Manage</button>
     </div>
+    <button class="side-btn" id="lockNowBtn" style="margin-bottom:16px;">🔒 Lock now</button>
 
     <div id="navPanels" style="display:none;">
       <div class="nav-section">
@@ -339,7 +358,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbw9GRBWrA5jl8RNhLHRSmXMeZhSt1Fz4U0neV-afpZB7yrCWHMMiU7Ed16THUdyVl-g/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbz8hY9nZAWdB9QA4eONb2aGgqn4TyEYTPhEEwMwmP7ND8_gNEtpyXfVbO46uzmWb9Th/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -619,9 +638,12 @@
   }
 
   // ---------------- API layer ----------------
+  // Must match APP_SECRET in gaji-sheets-backend.gs exactly, or every request will be rejected.
+  const APP_SECRET = "changeme-secret";
+
   async function apiCall(action, params, body){
     if (!API_URL) throw new Error('Not connected to a database yet.');
-    let url = API_URL + (API_URL.includes('?') ? '&' : '?') + 'action=' + encodeURIComponent(action);
+    let url = API_URL + (API_URL.includes('?') ? '&' : '?') + 'action=' + encodeURIComponent(action) + '&secret=' + encodeURIComponent(APP_SECRET);
     if (params) for (const k in params) if (params[k] !== undefined && params[k] !== null) url += '&' + k + '=' + encodeURIComponent(params[k]);
     const opts = { method: body ? 'POST' : 'GET' };
     if (body) opts.body = JSON.stringify(body);
@@ -1674,7 +1696,43 @@
       setConnBadge('off', 'Not connected');
     }
   }
-  boot();
+
+  // ---------------- Password lock screen ----------------
+  // NOTE: this is a light deterrent, not real security — anyone who can view this
+  // page's source can see APP_PASSWORD. The Google Sheet backend's own secret key
+  // check (see gaji-sheets-backend.gs) is what actually protects your data.
+  const APP_PASSWORD = "changeme"; // <-- change this to your own password
+  const LOCK_KEY = 'gaji_unlocked';
+
+  function unlockApp(){
+    document.getElementById('lockScreen').style.display = 'none';
+    boot();
+  }
+  function tryUnlock(){
+    const val = document.getElementById('lockPasswordInput').value;
+    const remember = document.getElementById('lockRemember').checked;
+    if (val === APP_PASSWORD){
+      if (remember){ try{ localStorage.setItem(LOCK_KEY, 'yes'); }catch(e){} }
+      else{ try{ sessionStorage.setItem(LOCK_KEY, 'yes'); }catch(e){} }
+      document.getElementById('lockError').style.display = 'none';
+      unlockApp();
+    } else {
+      document.getElementById('lockError').style.display = 'block';
+    }
+  }
+  document.getElementById('lockUnlockBtn').addEventListener('click', tryUnlock);
+  document.getElementById('lockPasswordInput').addEventListener('keydown', (e)=>{ if (e.key==='Enter') tryUnlock(); });
+  document.getElementById('lockNowBtn').addEventListener('click', ()=>{
+    try{ localStorage.removeItem(LOCK_KEY); sessionStorage.removeItem(LOCK_KEY); }catch(e){}
+    document.getElementById('lockPasswordInput').value = '';
+    document.getElementById('lockScreen').style.display = 'flex';
+    document.getElementById('lockPasswordInput').focus();
+  });
+
+  let alreadyUnlocked = false;
+  try{ alreadyUnlocked = localStorage.getItem(LOCK_KEY)==='yes' || sessionStorage.getItem(LOCK_KEY)==='yes'; }catch(e){}
+  if (alreadyUnlocked){ unlockApp(); }
+  else { document.getElementById('lockPasswordInput').focus(); }
 })();
 </script>
 </body>
