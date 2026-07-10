@@ -602,7 +602,10 @@
       </div>
       <div class="report-head" style="margin-top:-10px; margin-bottom:16px;">
         <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox" id="afSelectAll" style="width:17px; height:17px; accent-color:#b8863c;"> Select all</label>
-        <button class="btn-outline" id="afBulkSameLastBtn">↻ Same as last month (selected)</button>
+        <div class="toolbar-actions">
+          <button class="btn-outline" id="afBulkSameLastBtn">↻ Same as last month (selected)</button>
+          <button class="btn-outline" id="afSaveAllBtn">💾 Save all</button>
+        </div>
       </div>
       <div id="allStaffBody"></div>
     </div>
@@ -1878,13 +1881,30 @@
         const calc = calcStatutory(staff, readCardPay(), co, {year, month});
         card.querySelector('.net').textContent = `Net: RM ${fmt(calc.netSalary)}`;
       }
+      function fillCardPay(pay){
+        card.querySelectorAll('[data-field]').forEach(inp=>{
+          if (inp.type==='checkbox') inp.checked = pay[inp.dataset.field]==='yes';
+          else inp.value = pay[inp.dataset.field]||'';
+        });
+        overrideBox.style.display = overrideCb.checked ? 'grid' : 'none';
+        updateNet();
+      }
+      async function saveCard(){
+        await dbSavePayslip(currentCompanyId, staffId, year, month, readCardPay());
+        delete staffHistoryCache[currentCompanyId+':'+staffId];
+      }
+      // exposed so bulk toolbar actions (outside this closure) can drive this card
+      card._readCardPay = readCardPay;
+      card._fillCardPay = fillCardPay;
+      card._saveCard = saveCard;
+      card._staff = staff;
+
       card.querySelectorAll('input[data-field]:not([type=checkbox])').forEach(inp=>inp.addEventListener('input', updateNet));
       overrideCb.addEventListener('change', ()=>{ overrideBox.style.display = overrideCb.checked ? 'grid' : 'none'; updateNet(); });
 
       card.querySelector('.af-save').addEventListener('click', async ()=>{
         try{
-          await dbSavePayslip(currentCompanyId, staffId, year, month, readCardPay());
-          delete staffHistoryCache[currentCompanyId+':'+staffId];
+          await saveCard();
           toast(`${staff.empName} saved`);
         }catch(e){ toast('Save failed: ' + e.message, true); }
       });
@@ -1920,16 +1940,29 @@
     const month = parseInt(allStaffMonthSel.value);
     let py = month-1, yy = year;
     if (py < 0){ py = 11; yy -= 1; }
-    let updated = 0, skipped = 0;
+    let filled = 0, skipped = 0;
     for (const staffId of selected){
+      const card = document.querySelector(`.af-card[data-staff-id="${staffId}"]`);
+      if (!card) continue;
       let prev;
       try{ prev = await dbGetPayslip(currentCompanyId, staffId, yy, py, 'A'); }catch(e){ prev = null; }
       if (!prev){ skipped++; continue; }
-      const copy = JSON.parse(JSON.stringify(prev)); // independent copy — never touches last month's saved record
-      try{ await dbSavePayslip(currentCompanyId, staffId, year, month, copy, 'A'); updated++; }
-      catch(e){ skipped++; }
+      card._fillCardPay(JSON.parse(JSON.stringify(prev)));
+      card.classList.add('open');
+      filled++;
     }
-    toast(`Copied ${titleCase(MONTHS[py])} ${yy} into ${updated} staff${skipped ? `, ${skipped} skipped (no prior data)` : ''}`);
+    toast(`Filled ${filled} staff with ${titleCase(MONTHS[py])} ${yy} figures${skipped ? `, ${skipped} skipped (no prior data)` : ''} — review, edit if needed, then Save all`);
+  });
+
+  document.getElementById('afSaveAllBtn').addEventListener('click', async ()=>{
+    const cards = document.querySelectorAll('.af-card');
+    if (cards.length===0){ toast('No staff to save.'); return; }
+    let saved = 0, failed = 0;
+    for (const card of cards){
+      try{ await card._saveCard(); saved++; }
+      catch(e){ failed++; }
+    }
+    toast(`Saved ${saved} payslip${saved===1?'':'s'}${failed ? `, ${failed} failed` : ''}`);
     await renderAllStaff();
   });
 
