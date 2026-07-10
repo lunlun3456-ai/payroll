@@ -521,6 +521,7 @@
       <div class="fc-actions">
         <button class="fc-btn primary" id="savePayslipBtn">Save this month's payslip</button>
         <button class="fc-btn ghost" id="cancelPayBtn">Cancel</button>
+        <button class="fc-btn danger" id="deletePayslipBtn">Delete this payslip</button>
       </div>
     </div>
 
@@ -683,6 +684,11 @@
     variant = variant || 'A';
     await apiCall('savePayslip', null, {companyId, staffId, year, month, variant, data});
     payslipCache[companyId+':'+staffId+':'+year+'-'+month+':'+variant] = data;
+  }
+  async function dbDeletePayslip(companyId, staffId, year, month, variant){
+    variant = variant || 'A';
+    await apiCall('deletePayslip', {staffId, year, month, variant});
+    payslipCache[companyId+':'+staffId+':'+year+'-'+month+':'+variant] = null;
   }
   async function dbListStaffHistory(companyId, staffId){
     const cacheKey = companyId+':'+staffId;
@@ -1085,12 +1091,8 @@
     try{
       const pay = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth);
       fillPayForm(pay);
-      if (!pay){
-        const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
-        document.getElementById('workingDays').value = daysInMonth;
-        document.getElementById('daysWorked').value = daysInMonth;
-      }
-    }catch(e){ toast('Could not load payslip: ' + e.message, true); fillPayForm(null); }
+      applyAttendanceDefaultsIfBlank();
+    }catch(e){ toast('Could not load payslip: ' + e.message, true); fillPayForm(null); applyAttendanceDefaultsIfBlank(); }
     isDirty = false;
     await renderHistoryChips();
     renderPayslip();
@@ -1222,6 +1224,16 @@
     document.getElementById('copyFromBBtn').style.display = currentVariant === 'A' ? 'inline-flex' : 'none';
   }
 
+  function applyAttendanceDefaultsIfBlank(){
+    const wdField = document.getElementById('workingDays');
+    const dwField = document.getElementById('daysWorked');
+    if (!wdField.value || parseFloat(wdField.value) <= 0){
+      const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+      wdField.value = daysInMonth;
+      if (!dwField.value || parseFloat(dwField.value) <= 0) dwField.value = daysInMonth;
+    }
+  }
+
   async function switchVariant(variant){
     currentVariant = variant;
     setVariantTabsUI();
@@ -1229,6 +1241,7 @@
     try{ pay = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, variant); }
     catch(e){ toast('Could not load Payslip ' + variant + ': ' + e.message, true); }
     fillPayForm(pay);
+    applyAttendanceDefaultsIfBlank();
     isDirty = false;
   }
   document.querySelectorAll('.variant-tab').forEach(btn=>{
@@ -1333,6 +1346,23 @@
     } else {
       toast(`Payslip B saved — switch to the Payslip A tab to copy these deductions across if needed`);
     }
+  });
+
+  document.getElementById('deletePayslipBtn').addEventListener('click', async ()=>{
+    if (!currentStaffId) return;
+    const staff = staffList.find(s=>s.id===currentStaffId);
+    const monthLabel = titleCase(MONTHS[currentMonth]);
+    if (!confirm(`Delete Payslip ${currentVariant} for ${staff ? staff.empName : 'this staff'} — ${monthLabel} ${currentYear}? This cannot be undone.`)) return;
+    try{ await dbDeletePayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, currentVariant); }
+    catch(e){ toast('Delete failed: ' + e.message, true); return; }
+    fillPayForm(null);
+    applyAttendanceDefaultsIfBlank();
+    isDirty = false;
+    if (currentVariant === 'A'){
+      delete staffHistoryCache[currentCompanyId+':'+currentStaffId];
+      await renderHistoryChips();
+    }
+    toast(`Payslip ${currentVariant} deleted for ${monthLabel} ${currentYear}`);
   });
 
   document.getElementById('sameAsLastBtn').addEventListener('click', async ()=>{
