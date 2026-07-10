@@ -369,7 +369,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbyYGUFASwc5Lv8r6_G9X9xFfTYIVyHUSVxgkXCkZbcC72Zg-UC3qharfoz-QIeFkqgp/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbw4jK6l1CviXGWF4Kr84HjvL-8y89W2fjEzH5G5826IF8TMj53iTXRdh6fIrKOrvNEw/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -432,6 +432,15 @@
         <div class="fc-group"><label class="fc-label">EPF no.</label><input type="text" class="fc-input" id="empEpfNo" placeholder="12345677899"></div>
         <div class="fc-group"><label class="fc-label">SOCSO no.</label><input type="text" class="fc-input" id="empSocsoNo" placeholder="123456789"></div>
         <div class="fc-group"><label class="fc-label">Tax no.</label><input type="text" class="fc-input" id="empTaxNo" placeholder="123456789"></div>
+      </div>
+      <div class="fc-grid2">
+        <div class="fc-group"><label class="fc-label">Employment status</label>
+          <select class="fc-select" id="empEmploymentStatus">
+            <option value="active">Active</option>
+            <option value="resigned">Resigned</option>
+          </select>
+        </div>
+        <div class="fc-group"><label class="fc-label">Resignation / end date</label><input type="date" class="fc-input" id="empEndDate"></div>
       </div>
       <div class="fc-actions">
         <button class="fc-btn primary" id="saveProfileBtn">Save profile</button>
@@ -591,6 +600,10 @@
           <button class="fc-btn ghost" id="allStaffBackBtn">Back</button>
         </div>
       </div>
+      <div class="report-head" style="margin-top:-10px; margin-bottom:16px;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox" id="afSelectAll" style="width:17px; height:17px; accent-color:#b8863c;"> Select all</label>
+        <button class="btn-outline" id="afBulkSameLastBtn">↻ Same as last month (selected)</button>
+      </div>
       <div id="allStaffBody"></div>
     </div>
   </div>
@@ -667,7 +680,7 @@
 
   // ---------------- API layer ----------------
   // Must match APP_SECRET in gaji-sheets-backend.gs exactly, or every request will be rejected.
-  const APP_SECRET = "changeme-secret";
+  const APP_SECRET = "Fuckyou3456@";
 
   async function apiCall(action, params, body){
     if (!API_URL) throw new Error('Not connected to a database yet.');
@@ -1113,9 +1126,10 @@
     if (staffList.length === 0){ empty.style.display='block'; return; }
     empty.style.display='none';
     staffList.forEach(staff=>{
+      const isResigned = staff.empEmploymentStatus === 'resigned';
       const item = document.createElement('div');
       item.className = 'staff-item' + (staff.id===currentStaffId ? ' active':'');
-      item.innerHTML = `<div><div class="staff-name">${esc(staff.empName||'Unnamed')}</div><div class="staff-role">${esc(staff.empPosition||'')}</div></div><span class="x" title="Delete staff">✕</span>`;
+      item.innerHTML = `<div><div class="staff-name">${esc(staff.empName||'Unnamed')}${isResigned ? ' <span style="color:#e9a898; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px;">· Resigned</span>' : ''}</div><div class="staff-role">${esc(staff.empPosition||'')}</div></div><span class="x" title="Delete staff">✕</span>`;
       item.addEventListener('click', (e)=>{
         if (e.target.classList.contains('x')){ e.stopPropagation(); confirmDeleteStaff(staff.id); }
         else { selectStaff(staff.id); }
@@ -1136,6 +1150,8 @@
       empEpfNo: document.getElementById('empEpfNo').value.trim(),
       empSocsoNo: document.getElementById('empSocsoNo').value.trim(),
       empTaxNo: document.getElementById('empTaxNo').value.trim(),
+      empEmploymentStatus: document.getElementById('empEmploymentStatus').value,
+      empEndDate: document.getElementById('empEndDate').value,
     };
   }
   function readPayForm(){
@@ -1159,6 +1175,8 @@
     document.getElementById('empEpfNo').value = staff.empEpfNo||'';
     document.getElementById('empSocsoNo').value = staff.empSocsoNo||'';
     document.getElementById('empTaxNo').value = staff.empTaxNo||'';
+    document.getElementById('empEmploymentStatus').value = staff.empEmploymentStatus||'active';
+    document.getElementById('empEndDate').value = staff.empEndDate||'';
   }
   function fillPayForm(pay){
     PAY_FIELDS.forEach(id=>{ document.getElementById(id).value = pay ? (pay[id]||'') : ''; });
@@ -1784,7 +1802,10 @@
       cardsHtml.push(`
         <div class="af-card" data-staff-id="${staff.id}">
           <div class="af-head">
-            <div><span class="name">${esc(staff.empName||'Unnamed')}</span><span class="role">${esc(staff.empPosition||'')}</span></div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <input type="checkbox" class="af-select" data-staff-id="${staff.id}" style="width:17px; height:17px; accent-color:#b8863c;" onclick="event.stopPropagation()">
+              <div><span class="name">${esc(staff.empName||'Unnamed')}</span><span class="role">${esc(staff.empPosition||'')}</span></div>
+            </div>
             <div style="display:flex; align-items:center; gap:14px;">
               <span class="net">Net: RM ${fmt(calc.netSalary)}</span>
               <span class="chev">▾</span>
@@ -1810,6 +1831,7 @@
       `);
     }
     body.innerHTML = cardsHtml.join('');
+    document.getElementById('afSelectAll').checked = false;
 
     body.querySelectorAll('.af-card').forEach(card=>{
       const staffId = card.dataset.staffId;
@@ -1860,6 +1882,29 @@
   document.getElementById('allStaffBackBtn').addEventListener('click', ()=>showView('payslip'));
   document.getElementById('allStaffMonth').addEventListener('change', renderAllStaff);
   document.getElementById('allStaffYear').addEventListener('change', renderAllStaff);
+
+  document.getElementById('afSelectAll').addEventListener('change', (e)=>{
+    document.querySelectorAll('.af-select').forEach(cb=> cb.checked = e.target.checked);
+  });
+
+  document.getElementById('afBulkSameLastBtn').addEventListener('click', async ()=>{
+    const selected = Array.from(document.querySelectorAll('.af-select:checked')).map(cb=>cb.dataset.staffId);
+    if (selected.length===0){ toast('Tick at least one staff member first.'); return; }
+    const year = parseInt(document.getElementById('allStaffYear').value)||new Date().getFullYear();
+    const month = parseInt(allStaffMonthSel.value);
+    let py = month-1, yy = year;
+    if (py < 0){ py = 11; yy -= 1; }
+    let updated = 0, skipped = 0;
+    for (const staffId of selected){
+      let prev;
+      try{ prev = await dbGetPayslip(currentCompanyId, staffId, yy, py, 'A'); }catch(e){ prev = null; }
+      if (!prev){ skipped++; continue; }
+      try{ await dbSavePayslip(currentCompanyId, staffId, year, month, prev, 'A'); updated++; }
+      catch(e){ skipped++; }
+    }
+    toast(`Copied ${titleCase(MONTHS[py])} ${yy} into ${updated} staff${skipped ? `, ${skipped} skipped (no prior data)` : ''}`);
+    await renderAllStaff();
+  });
 
   // ---------------- Connection flow ----------------
   async function connectWith(url){
@@ -1929,7 +1974,7 @@
   // NOTE: this is a light deterrent, not real security — anyone who can view this
   // page's source can see APP_PASSWORD. The Google Sheet backend's own secret key
   // check (see gaji-sheets-backend.gs) is what actually protects your data.
-  const APP_PASSWORD = "Fuckyou3456@"; // <-- change this to your own password
+  const APP_PASSWORD = "changeme"; // <-- change this to your own password
   const LOCK_KEY = 'gaji_unlocked';
 
   function unlockApp(){
