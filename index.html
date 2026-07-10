@@ -359,7 +359,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbzvPdeeICUkAFStQJ6t-RurWsLB5MGCj-dsU1VsCYB2NPlDacpJl5rlitBUxXPmN7Ku/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbyEkkivJ17MhF-nQxXnbz5HOt0gvq0A_s1varp4mA_A6KkDOR19TaBPvZEYA8pTeK0/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -771,7 +771,7 @@
     let eisEmployee = 0, eisEmployer = 0;
     if (!over60 && !foreign){ eisEmployee = Math.round(eisWage * 0.002 * 100)/100; eisEmployer = Math.round(eisWage * 0.002 * 100)/100; }
 
-    const lRate = over60 ? 0 : lindungRate(period.year, period.month);
+    const lRate = lindungRate(period.year, period.month);
     let lindungAmount = Math.round(socsoWage * lRate * 100)/100;
 
     // Manual override: fixed RM amounts on the employee side, in place of the auto-calculated figures.
@@ -1270,7 +1270,7 @@
     let eisEmployee = 0, eisEmployer = 0;
     if (!over60 && !foreign){ eisEmployee = Math.round(socsoWage * 0.002 * 100)/100; eisEmployer = Math.round(socsoWage * 0.002 * 100)/100; }
 
-    const lRate = over60 ? 0 : lindungRate(period.year, period.month);
+    const lRate = lindungRate(period.year, period.month);
     const lindungAmount = Math.round(socsoWage * lRate * 100)/100;
 
     return { epfEmployee, epfEmployer, socsoEmployee, socsoEmployer, eisEmployee, eisEmployer, lindungAmount };
