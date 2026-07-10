@@ -716,6 +716,32 @@
     return 0.0125;
   }
 
+  // KWSP Third Schedule (effective 1 Oct 2025), replicated as a formula rather than a
+  // hardcoded 2,000-row table. Verified against the official published table:
+  //  - Wages ≤ RM5,000: banded in RM20 steps, contribution = ceil(rate × band-upper-bound)
+  //  - RM5,000 < wages ≤ RM20,000: banded in RM100 steps, same ceiling rule
+  //  - Wages > RM20,000: straight percentage on actual wage, ceiling to next ringgit
+  //  - Part F (non-citizens): flat 2%/2% on actual wage, no banding at all
+  function roundUpRinggit(amount){ return Math.ceil(amount - 1e-9); }
+  function calcEPF(wage, over60, foreign){
+    if (wage <= 0) return { employee: 0, employer: 0 };
+    if (foreign){
+      // Part F — flat 2%/2%, no wage banding, regardless of age
+      return { employee: roundUpRinggit(wage * 0.02), employer: roundUpRinggit(wage * 0.02) };
+    }
+    if (wage <= 10) return { employee: 0, employer: 0 };
+    // Part A (under 60) or Part E (Malaysian citizen 60+)
+    const eeRate = over60 ? 0 : 0.11;
+    const erRateLow  = over60 ? 0.04 : 0.13;  // wage ≤ RM5,000
+    const erRateHigh = over60 ? 0.04 : 0.12;  // wage > RM5,000
+    let band;
+    if (wage <= 5000) band = Math.ceil(wage/20)*20;
+    else if (wage <= 20000) band = Math.ceil(wage/100)*100;
+    else band = wage;
+    const erRate = wage <= 5000 ? erRateLow : erRateHigh;
+    return { employee: roundUpRinggit(band * eeRate), employer: roundUpRinggit(band * erRate) };
+  }
+
   function calcStatutory(profile, pay, company, period){
     company = company || {};
     period = period || { year: currentYear, month: currentMonth };
@@ -756,13 +782,9 @@
     const over60 = profile.empAge === 'over60';
     const foreign = profile.empStatus === 'foreign';
 
-    let epfEmployeeRate, epfEmployerRate;
-    if (over60){ epfEmployeeRate = 0; epfEmployerRate = 0.04; }
-    else if (foreign){ epfEmployeeRate = 0.02; epfEmployerRate = 0.02; }
-    else { epfEmployeeRate = 0.11; epfEmployerRate = statutoryWage <= 5000 ? 0.13 : 0.12; }
-
-    let epfEmployee = Math.round(statutoryWage * epfEmployeeRate * 100)/100;
-    let epfEmployer = Math.round(statutoryWage * epfEmployerRate * 100)/100;
+    const epfResult = calcEPF(statutoryWage, over60, foreign);
+    let epfEmployee = epfResult.employee;
+    let epfEmployer = epfResult.employer;
 
     let socsoEmployee, socsoEmployer;
     if (over60){ socsoEmployee = 0; socsoEmployer = Math.round(socsoWage * 0.0125 * 100)/100; }
@@ -1256,12 +1278,9 @@
     const over60 = profile.empAge === 'over60';
     const foreign = profile.empStatus === 'foreign';
 
-    let epfEmployeeRate, epfEmployerRate;
-    if (over60){ epfEmployeeRate = 0; epfEmployerRate = 0.04; }
-    else if (foreign){ epfEmployeeRate = 0.02; epfEmployerRate = 0.02; }
-    else { epfEmployeeRate = 0.11; epfEmployerRate = wage <= 5000 ? 0.13 : 0.12; }
-    const epfEmployee = Math.round(wage * epfEmployeeRate * 100)/100;
-    const epfEmployer = Math.round(wage * epfEmployerRate * 100)/100;
+    const epfResult = calcEPF(wage, over60, foreign);
+    const epfEmployee = epfResult.employee;
+    const epfEmployer = epfResult.employer;
 
     let socsoEmployee, socsoEmployer;
     if (over60){ socsoEmployee = 0; socsoEmployer = Math.round(socsoWage * 0.0125 * 100)/100; }
