@@ -462,13 +462,24 @@
         <label class="fc-label" style="margin:0;" for="overrideDeductions">Use fixed RM amounts below instead of auto-calculating EPF/SOCSO/EIS/LINDUNG from salary</label>
       </div>
       <div id="overrideFields" style="display:none;">
-        <div class="fc-sub" style="margin:-4px 0 14px; font-size:12px;">Employer contributions still auto-calculate normally — this only fixes what's shown/deducted on the employee's side.</div>
+        <div class="fc-sub" style="margin:-4px 0 14px; font-size:12px;">Key in a salary amount and calculate — useful for Payslip A when the actual pay is prorated (resigned/absent) but deductions should still follow the full normal salary.</div>
+        <div class="fc-grid3" style="align-items:end;">
+          <div class="fc-group" style="grid-column: span 2;"><label class="fc-label">Reference salary for calculation (RM)</label><input type="number" class="fc-input" id="refSalary" placeholder="e.g. 1700.00" step="0.01"></div>
+          <button type="button" class="fc-btn ghost" id="calcFromRefBtn" style="margin-bottom:0;">Calculate &amp; fill in</button>
+        </div>
+        <div class="fc-sub" style="margin:4px 0 6px; font-size:11.5px; font-weight:600; color:var(--ink-soft);">Employee side (deducted from pay)</div>
         <div class="fc-grid3">
           <div class="fc-group"><label class="fc-label">EPF (RM)</label><input type="number" class="fc-input" id="customEpf" placeholder="0.00" step="0.01"></div>
           <div class="fc-group"><label class="fc-label">SOCSO (RM)</label><input type="number" class="fc-input" id="customSocso" placeholder="0.00" step="0.01"></div>
           <div class="fc-group"><label class="fc-label">EIS (RM)</label><input type="number" class="fc-input" id="customEis" placeholder="0.00" step="0.01"></div>
         </div>
         <div class="fc-group"><label class="fc-label">LINDUNG 24 Jam (RM)</label><input type="number" class="fc-input" id="customLindung" placeholder="0.00" step="0.01"></div>
+        <div class="fc-sub" style="margin:4px 0 6px; font-size:11.5px; font-weight:600; color:var(--ink-soft);">Employer side (optional — leave blank to keep auto-calculating from actual earnings)</div>
+        <div class="fc-grid3">
+          <div class="fc-group"><label class="fc-label">Employer EPF (RM)</label><input type="number" class="fc-input" id="customEpfEmployer" placeholder="0.00" step="0.01"></div>
+          <div class="fc-group"><label class="fc-label">Employer SOCSO (RM)</label><input type="number" class="fc-input" id="customSocsoEmployer" placeholder="0.00" step="0.01"></div>
+          <div class="fc-group"><label class="fc-label">Employer EIS (RM)</label><input type="number" class="fc-input" id="customEisEmployer" placeholder="0.00" step="0.01"></div>
+        </div>
       </div>
 
       <div class="fc-section-title">Leave record (for reference on payslip)</div>
@@ -553,7 +564,7 @@
   allStaffMonthSel.value = new Date().getMonth();
   document.getElementById('allStaffYear').value = new Date().getFullYear();
 
-  const PAY_FIELDS = ['basicSalary','workingDays','daysWorked','eoHours','latHours','tofHours','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct','alTaken','alBalance','alYtd','mcTaken','mcBalance','mcYtd','otherLeave','customEpf','customSocso','customEis','customLindung'];
+  const PAY_FIELDS = ['basicSalary','workingDays','daysWorked','eoHours','latHours','tofHours','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct','alTaken','alBalance','alYtd','mcTaken','mcBalance','mcYtd','otherLeave','refSalary','customEpf','customSocso','customEis','customLindung','customEpfEmployer','customSocsoEmployer','customEisEmployer'];
   const AMOUNT_FIELDS = ['basicSalary','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct'];
   const LS_KEY = 'gaji_apps_script_url';
 
@@ -719,7 +730,7 @@
     else { epfEmployeeRate = 0.11; epfEmployerRate = statutoryWage <= 5000 ? 0.13 : 0.12; }
 
     let epfEmployee = Math.round(statutoryWage * epfEmployeeRate * 100)/100;
-    const epfEmployer = Math.round(statutoryWage * epfEmployerRate * 100)/100;
+    let epfEmployer = Math.round(statutoryWage * epfEmployerRate * 100)/100;
 
     let socsoEmployee, socsoEmployer;
     if (over60){ socsoEmployee = 0; socsoEmployer = Math.round(socsoWage * 0.0125 * 100)/100; }
@@ -732,13 +743,16 @@
     let lindungAmount = Math.round(socsoWage * lRate * 100)/100;
 
     // Manual override: fixed RM amounts on the employee side, in place of the auto-calculated figures.
-    // Employer contributions above are left untouched (still statutory-accurate for filing purposes).
+    // Employer-side overrides are optional — left blank, they keep auto-calculating from actual earnings (statutory-accurate for filing).
     const isOverride = pay.overrideDeductions === 'yes';
     if (isOverride){
       if (pay.customEpf !== undefined && pay.customEpf !== '') epfEmployee = parseFloat(pay.customEpf)||0;
       if (pay.customSocso !== undefined && pay.customSocso !== '') socsoEmployee = parseFloat(pay.customSocso)||0;
       if (pay.customEis !== undefined && pay.customEis !== '') eisEmployee = parseFloat(pay.customEis)||0;
       if (pay.customLindung !== undefined && pay.customLindung !== '') lindungAmount = parseFloat(pay.customLindung)||0;
+      if (pay.customEpfEmployer !== undefined && pay.customEpfEmployer !== '') epfEmployer = parseFloat(pay.customEpfEmployer)||0;
+      if (pay.customSocsoEmployer !== undefined && pay.customSocsoEmployer !== '') socsoEmployer = parseFloat(pay.customSocsoEmployer)||0;
+      if (pay.customEisEmployer !== undefined && pay.customEisEmployer !== '') eisEmployer = parseFloat(pay.customEisEmployer)||0;
     }
 
     const earnings = [
@@ -1184,6 +1198,53 @@
     btn.addEventListener('click', ()=> switchVariant(btn.dataset.variant));
   });
 
+  // Computes standard employee + employer EPF/SOCSO/EIS/LINDUNG amounts from a raw salary figure,
+  // independent of any actual earnings on a payslip — used by the "Calculate & fill in" override helper.
+  function calcStandardDeductions(salary, profile, period){
+    const wage = Math.max(salary, 0);
+    const socsoWage = Math.min(wage, 6000);
+    const over60 = profile.empAge === 'over60';
+    const foreign = profile.empStatus === 'foreign';
+
+    let epfEmployeeRate, epfEmployerRate;
+    if (over60){ epfEmployeeRate = 0; epfEmployerRate = 0.04; }
+    else if (foreign){ epfEmployeeRate = 0.02; epfEmployerRate = 0.02; }
+    else { epfEmployeeRate = 0.11; epfEmployerRate = wage <= 5000 ? 0.13 : 0.12; }
+    const epfEmployee = Math.round(wage * epfEmployeeRate * 100)/100;
+    const epfEmployer = Math.round(wage * epfEmployerRate * 100)/100;
+
+    let socsoEmployee, socsoEmployer;
+    if (over60){ socsoEmployee = 0; socsoEmployer = Math.round(socsoWage * 0.0125 * 100)/100; }
+    else { socsoEmployee = Math.round(socsoWage * 0.005 * 100)/100; socsoEmployer = Math.round(socsoWage * 0.0175 * 100)/100; }
+
+    let eisEmployee = 0, eisEmployer = 0;
+    if (!over60 && !foreign){ eisEmployee = Math.round(socsoWage * 0.002 * 100)/100; eisEmployer = Math.round(socsoWage * 0.002 * 100)/100; }
+
+    const lRate = over60 ? 0 : lindungRate(period.year, period.month);
+    const lindungAmount = Math.round(socsoWage * lRate * 100)/100;
+
+    return { epfEmployee, epfEmployer, socsoEmployee, socsoEmployer, eisEmployee, eisEmployer, lindungAmount };
+  }
+
+  document.getElementById('calcFromRefBtn').addEventListener('click', ()=>{
+    if (!currentStaffId){ toast('Select a staff member first.'); return; }
+    const refSalary = parseFloat(document.getElementById('refSalary').value);
+    if (!refSalary || refSalary <= 0){ toast('Enter a reference salary amount first.', true); return; }
+    const profile = readProfileForm();
+    const r = calcStandardDeductions(refSalary, profile, {year: currentYear, month: currentMonth});
+    document.getElementById('overrideDeductions').checked = true;
+    document.getElementById('overrideFields').style.display = 'block';
+    document.getElementById('customEpf').value = r.epfEmployee;
+    document.getElementById('customSocso').value = r.socsoEmployee;
+    document.getElementById('customEis').value = r.eisEmployee;
+    document.getElementById('customLindung').value = r.lindungAmount;
+    document.getElementById('customEpfEmployer').value = r.epfEmployer;
+    document.getElementById('customSocsoEmployer').value = r.socsoEmployer;
+    document.getElementById('customEisEmployer').value = r.eisEmployer;
+    isDirty = true;
+    toast(`Calculated from RM ${fmt(refSalary)} — EPF/SOCSO/EIS/LINDUNG filled in for both employee and employer. Remember to save.`);
+  });
+
   document.getElementById('copyFromBBtn').addEventListener('click', async ()=>{
     if (!currentStaffId) return;
     const staff = staffList.find(s=>s.id===currentStaffId);
@@ -1199,6 +1260,9 @@
     document.getElementById('customSocso').value = calcB.socsoEmployee;
     document.getElementById('customEis').value = calcB.eisEmployee;
     document.getElementById('customLindung').value = calcB.lindungAmount;
+    document.getElementById('customEpfEmployer').value = calcB.epfEmployer;
+    document.getElementById('customSocsoEmployer').value = calcB.socsoEmployer;
+    document.getElementById('customEisEmployer').value = calcB.eisEmployer;
     isDirty = true;
     toast('Copied EPF / SOCSO / EIS / LINDUNG amounts from Payslip B — remember to save Payslip A');
   });
@@ -1250,25 +1314,56 @@
     showView('pay');
   });
 
-  document.getElementById('printBtn').addEventListener('click', ()=>{
-    const staff = staffList.find(s=>s.id===currentStaffId);
-    const co = companies.find(c=>c.id===currentCompanyId);
-    if (!staff || !co){ window.print(); return; }
-    const pay = readPayForm();
-    const hasAnyPay = AMOUNT_FIELDS.some(k=>parseFloat(pay[k])>0);
-    if (!hasAnyPay){ window.print(); return; }
-    const calc = calcStatutory(staff, pay, co, {year: currentYear, month: currentMonth});
-    const html = buildPayslipHTML(co, staff, {year: currentYear, month: currentMonth}, calc, {dirty:isDirty});
+  function printDuo(topHtml, bottomHtml, topLabel, bottomLabel){
     document.getElementById('duoPrintArea').innerHTML = `
       <div class="print-page">
-        <div class="copy-label">Employee copy</div>
-        <div class="payslip compact">${html}</div>
+        <div class="copy-label">${topLabel}</div>
+        <div class="payslip compact">${topHtml}</div>
         <div class="cut-line"><span>✂ cut here</span></div>
-        <div class="copy-label">Office copy</div>
-        <div class="payslip compact">${html}</div>
+        <div class="copy-label">${bottomLabel}</div>
+        <div class="payslip compact">${bottomHtml}</div>
       </div>`;
     document.body.classList.add('duo-mode');
     window.print();
+  }
+
+  document.getElementById('printBtn').addEventListener('click', async ()=>{
+    const staff = staffList.find(s=>s.id===currentStaffId);
+    const co = companies.find(c=>c.id===currentCompanyId);
+    if (!staff || !co){ window.print(); return; }
+
+    let payA, payB;
+    try{
+      payA = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, 'A');
+      payB = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, 'B');
+    }catch(e){ toast('Could not load payslip data: ' + e.message, true); payA = null; payB = null; }
+
+    const hasA = payA && AMOUNT_FIELDS.some(k=>parseFloat(payA[k])>0);
+    const hasB = payB && AMOUNT_FIELDS.some(k=>parseFloat(payB[k])>0);
+    const period = {year: currentYear, month: currentMonth};
+
+    if (hasA && hasB){
+      const calcA = calcStatutory(staff, payA, co, period);
+      const calcB = calcStatutory(staff, payB, co, period);
+      const sameAmount = Math.abs(calcA.netSalary - calcB.netSalary) < 0.01 && Math.abs(calcA.totalEarnings - calcB.totalEarnings) < 0.01;
+      if (sameAmount){
+        const html = buildPayslipHTML(co, staff, period, calcB, {});
+        printDuo(html, html, 'Employee copy', 'Office copy');
+      } else {
+        const htmlA = buildPayslipHTML(co, staff, period, calcA, {});
+        const htmlB = buildPayslipHTML(co, staff, period, calcB, {});
+        printDuo(htmlA, htmlB, 'Payslip A', 'Payslip B');
+      }
+      return;
+    }
+
+    // Only one variant saved (or neither) — fall back to the currently open form, duplicated as employee/office copy
+    const only = hasA ? payA : (hasB ? payB : readPayForm());
+    const hasAnyPay = AMOUNT_FIELDS.some(k=>parseFloat(only[k])>0);
+    if (!hasAnyPay){ window.print(); return; }
+    const calc = calcStatutory(staff, only, co, period);
+    const html = buildPayslipHTML(co, staff, period, calc, {dirty: (!hasA && !hasB) ? isDirty : false});
+    printDuo(html, html, 'Employee copy', 'Office copy');
   });
   window.addEventListener('afterprint', ()=>{ document.body.classList.remove('duo-mode'); });
 
