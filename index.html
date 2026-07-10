@@ -369,7 +369,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbw4uXBvc91xCdUX28vocg7dR2ly3SoqayAGXZWlvPi7BRUdtQVsRM4lIVz5LlApFk4T/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbw4XNYmBu_XGurfdfd_qon_GzxOykNP1qkN5dFRwhaC6SAlZ-H2mobrgo2HBIQcfreH/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -653,7 +653,7 @@
   }
   const fmt = (n) => (isFinite(n)?n:0).toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2});
   const fmtInt = (n) => { const v = parseFloat(n); return isFinite(v) ? (Number.isInteger(v) ? v : v.toFixed(2)) : 0; };
-  const esc = (s) => (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   function getSavedUrl(){ try{ return localStorage.getItem(LS_KEY); }catch(e){ return null; } }
   function saveUrl(url){ try{ localStorage.setItem(LS_KEY, url); }catch(e){} }
@@ -1819,6 +1819,7 @@
 
     const cardsHtml = [];
     for (const staff of staffList){
+      try{
       let pay;
       try{ pay = await dbGetPayslip(currentCompanyId, staff.id, year, month); }catch(e){ pay = null; }
       pay = pay || {};
@@ -1858,6 +1859,9 @@
           </div>
         </div>
       `);
+      }catch(e){
+        cardsHtml.push(`<div class="af-card"><div class="af-head"><div><span class="name">${esc(staff.empName||'Unnamed')}</span></div><div style="color:#a3402f; font-size:12px;">Could not load: ${esc(e.message)}</div></div></div>`);
+      }
     }
     body.innerHTML = cardsHtml.join('');
     document.getElementById('afSelectAll').checked = false;
