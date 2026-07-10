@@ -108,7 +108,7 @@
   /* ---- payslip: bordered-box template style ---- */
   .payslip{ width:100%; max-width:800px; background:#fff; box-shadow: var(--shadow); margin-bottom:20px; font-family: Arial, Helvetica, sans-serif; color:#111; padding:30px 36px 26px; }
   .ps-header{ display:flex; align-items:flex-start; gap:16px; margin-bottom:16px; }
-  .ps-logo{ width:50px; height:50px; border-radius:50%; background:var(--ink); color:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:19px; flex-shrink:0; font-family:"Iowan Old Style","Georgia",serif; }
+  .ps-logo{ width:50px; height:50px; border-radius:50%; background:var(--ink); color:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:19px; flex-shrink:0; font-family:"Iowan Old Style","Georgia",serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   .ps-header-main{ flex:1; }
   .ps-company{ font-size:21px; font-weight:800; letter-spacing:.3px; }
   .ps-address{ font-size:11.5px; color:#444; margin-top:4px; line-height:1.55; max-width:480px; }
@@ -202,6 +202,7 @@
   .cut-line span{ position:absolute; top:-7px; left:50%; transform:translateX(-50%); background:#fff; padding:0 8px; font-size:8.5px; color:#999; letter-spacing:1px; }
 
   @media print{
+    *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
     body{ background:#fff; }
     .sidebar, .toolbar, .toast, .ps-edit-hint{ display:none !important; }
     .main{ padding:0; }
@@ -216,7 +217,7 @@
     .print-page{ page-break-after: always; }
     .print-page:last-child{ page-break-after: auto; }
   }
-  @media (max-width: 900px){
+  @media screen and (max-width: 900px){
     .app{ grid-template-columns:1fr; }
     .sidebar{ order:2; }
     .main{ padding:22px 14px 40px; }
