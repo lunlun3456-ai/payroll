@@ -481,6 +481,9 @@
         <input type="checkbox" id="overrideDeductions" style="width:18px; height:18px; accent-color:#b8863c;">
         <label class="fc-label" style="margin:0;" for="overrideDeductions">Use fixed RM amounts below instead of auto-calculating EPF/SOCSO/EIS/LINDUNG from salary</label>
       </div>
+      <div id="prorationWarning" style="display:none; background:#fdf2e0; border:1px solid #d9a441; border-radius:8px; padding:10px 14px; font-size:12px; color:#7a5210; margin-bottom:14px;">
+        ⚠️ Days Worked is less than Working Days (partial month), but the override above is switched on — deductions will follow the fixed amounts instead of the reduced salary. Turn the override off if you want EPF/SOCSO/EIS/LINDUNG to auto-calculate from the actual prorated pay.
+      </div>
       <div id="overrideFields" style="display:none;">
         <div class="fc-sub" style="margin:-4px 0 14px; font-size:12px;">Key in a salary amount and calculate — useful for Payslip A when the actual pay is prorated (resigned/absent) but deductions should still follow the full normal salary.</div>
         <div class="fc-grid3" style="align-items:end;">
@@ -1046,10 +1049,21 @@
     const isOverride = pay && pay.overrideDeductions === 'yes';
     document.getElementById('overrideDeductions').checked = !!isOverride;
     document.getElementById('overrideFields').style.display = isOverride ? 'block' : 'none';
+    checkProrationOverrideConflict();
+  }
+  function checkProrationOverrideConflict(){
+    const workingDays = parseFloat(document.getElementById('workingDays').value)||0;
+    const daysWorked = parseFloat(document.getElementById('daysWorked').value);
+    const isProratedNow = workingDays > 0 && !isNaN(daysWorked) && daysWorked < workingDays;
+    const isOverrideNow = document.getElementById('overrideDeductions').checked;
+    document.getElementById('prorationWarning').style.display = (isProratedNow && isOverrideNow) ? 'block' : 'none';
   }
   document.getElementById('overrideDeductions').addEventListener('change', (e)=>{
     document.getElementById('overrideFields').style.display = e.target.checked ? 'block' : 'none';
+    checkProrationOverrideConflict();
   });
+  document.getElementById('workingDays').addEventListener('input', checkProrationOverrideConflict);
+  document.getElementById('daysWorked').addEventListener('input', checkProrationOverrideConflict);
 
   async function selectStaff(id){
     currentStaffId = id;
