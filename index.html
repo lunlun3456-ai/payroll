@@ -134,8 +134,8 @@
   .ps-bottom-row{ display:grid; grid-template-columns:1fr 1fr; gap:0 30px; font-size:12.5px; padding:3px 0; }
   .ps-bottom-row.strong{ font-weight:700; }
   .ps-bottom-row .bl{ display:flex; justify-content:space-between; }
-  .ps-empsign{ margin-top:26px; padding-top:16px; border-top:1px solid #111; font-size:12px; display:flex; align-items:flex-end; gap:12px; }
-  .ps-empsign .sign-line{ flex:1; max-width:240px; border-bottom:1px solid #111; height:20px; }
+  .ps-empsign{ margin-top:26px; padding-top:16px; border-top:1px solid #111; font-size:12px; display:flex; justify-content:flex-end; align-items:flex-end; gap:14px; }
+  .ps-empsign .sign-line{ width:200px; flex:none; border-bottom:1px solid #111; height:20px; }
   .ps-edit-hint{ width:100%; max-width:800px; display:flex; justify-content:flex-end; margin:-10px 0 14px; }
   .ps-edit-hint button{ background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:8px 14px; border-radius:7px; font-size:12.5px; cursor:pointer; font-family:inherit; }
   .ps-edit-hint button:hover{ border-color:var(--gold); color:var(--gold-deep); }
@@ -222,7 +222,7 @@
   .payslip.compact .ps-bottom{ margin-top:10px; padding-top:5px; }
   .payslip.compact .ps-bottom-row{ font-size:9.5px; padding:2px 0; }
   .payslip.compact .ps-empsign{ margin-top:10px; padding-top:6px; font-size:9.5px; gap:8px; }
-  .payslip.compact .ps-empsign .sign-line{ max-width:150px; height:12px; }
+  .payslip.compact .ps-empsign .sign-line{ width:120px; height:12px; }
   .copy-label{ text-align:center; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:#888; padding:4px 0; }
   .cut-line{ position:relative; text-align:center; margin:2mm 0; border-top:1px dashed #999; }
   .cut-line span{ position:absolute; top:-7px; left:50%; transform:translateX(-50%); background:#fff; padding:0 8px; font-size:8.5px; color:#999; letter-spacing:1px; }
@@ -1352,7 +1352,8 @@
       } else {
         const htmlA = buildPayslipHTML(co, staff, period, calcA, {});
         const htmlB = buildPayslipHTML(co, staff, period, calcB, {});
-        printDuo(htmlA, htmlB, 'Payslip A', 'Payslip B');
+        const monthLabel = titleCase(MONTHS[currentMonth]);
+        printDuo(htmlA, htmlB, `Payslip ${monthLabel}-0`, `Payslip ${monthLabel}-1`);
       }
       return;
     }
