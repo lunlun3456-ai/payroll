@@ -680,7 +680,7 @@
 
   // ---------------- API layer ----------------
   // Must match APP_SECRET in gaji-sheets-backend.gs exactly, or every request will be rejected.
-  const APP_SECRET = "Fuckyou3456@";
+  const APP_SECRET = "changeme-secret";
 
   async function apiCall(action, params, body){
     if (!API_URL) throw new Error('Not connected to a database yet.');
@@ -1528,7 +1528,7 @@
     let prev;
     try{ prev = await dbGetPayslip(currentCompanyId, currentStaffId, yy, py, currentVariant); }catch(e){ toast('Lookup failed: ' + e.message, true); return; }
     if (!prev){ toast(`No saved Payslip ${currentVariant} found for ${titleCase(MONTHS[py])} ${yy}`); return; }
-    fillPayForm(prev);
+    fillPayForm(JSON.parse(JSON.stringify(prev)));
     markDirty();
     toast(`Copied Payslip ${currentVariant} figures from ${titleCase(MONTHS[py])} ${yy} — review and save`);
     const staff = staffList.find(s=>s.id===currentStaffId);
@@ -1899,7 +1899,8 @@
       let prev;
       try{ prev = await dbGetPayslip(currentCompanyId, staffId, yy, py, 'A'); }catch(e){ prev = null; }
       if (!prev){ skipped++; continue; }
-      try{ await dbSavePayslip(currentCompanyId, staffId, year, month, prev, 'A'); updated++; }
+      const copy = JSON.parse(JSON.stringify(prev)); // independent copy — never touches last month's saved record
+      try{ await dbSavePayslip(currentCompanyId, staffId, year, month, copy, 'A'); updated++; }
       catch(e){ skipped++; }
     }
     toast(`Copied ${titleCase(MONTHS[py])} ${yy} into ${updated} staff${skipped ? `, ${skipped} skipped (no prior data)` : ''}`);
@@ -1974,7 +1975,7 @@
   // NOTE: this is a light deterrent, not real security — anyone who can view this
   // page's source can see APP_PASSWORD. The Google Sheet backend's own secret key
   // check (see gaji-sheets-backend.gs) is what actually protects your data.
-  const APP_PASSWORD = "changeme"; // <-- change this to your own password
+  const APP_PASSWORD = "Fuckyou3456@"; // <-- change this to your own password
   const LOCK_KEY = 'gaji_unlocked';
 
   function unlockApp(){
