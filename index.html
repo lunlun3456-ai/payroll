@@ -542,6 +542,7 @@
 
       <div class="fc-actions">
         <button class="fc-btn primary" id="savePayslipBtn">Save this month's payslip</button>
+        <button class="fc-btn primary" id="saveAndReturnABtn" style="display:none;">Save &amp; return to Payslip A</button>
         <button class="fc-btn ghost" id="cancelPayBtn">Cancel</button>
         <button class="fc-btn danger" id="deletePayslipBtn">Delete this payslip</button>
       </div>
@@ -1345,6 +1346,7 @@
       btn.classList.toggle('active', btn.dataset.variant === currentVariant);
     });
     document.getElementById('copyFromBBtn').style.display = currentVariant === 'A' ? 'inline-flex' : 'none';
+    document.getElementById('saveAndReturnABtn').style.display = currentVariant === 'B' ? 'inline-flex' : 'none';
   }
 
   function applyAttendanceDefaultsIfBlank(){
@@ -1453,22 +1455,35 @@
   document.getElementById('psEditPayBtn').addEventListener('click', openEditPay);
   document.getElementById('cancelPayBtn').addEventListener('click', ()=>showView('payslip'));
 
-  document.getElementById('savePayslipBtn').addEventListener('click', async ()=>{
-    if (!currentStaffId){ alert('Please add and save a staff profile first.'); return; }
+  async function savePayslipNow(){
+    if (!currentStaffId){ alert('Please add and save a staff profile first.'); return false; }
     const pay = readPayForm();
     try{ await dbSavePayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, pay, currentVariant); }
-    catch(e){ toast('Save failed: ' + e.message, true); return; }
+    catch(e){ toast('Save failed: ' + e.message, true); return false; }
     if (currentVariant === 'A'){
       delete staffHistoryCache[currentCompanyId+':'+currentStaffId];
       await renderHistoryChips();
     }
     isDirty = false;
+    return true;
+  }
+
+  document.getElementById('savePayslipBtn').addEventListener('click', async ()=>{
+    const ok = await savePayslipNow();
+    if (!ok) return;
     if (currentVariant === 'A'){
       toast(`Payslip A saved for ${titleCase(MONTHS[currentMonth])} ${currentYear}`);
       showView('payslip');
     } else {
       toast(`Payslip B saved — switch to the Payslip A tab to copy these deductions across if needed`);
     }
+  });
+
+  document.getElementById('saveAndReturnABtn').addEventListener('click', async ()=>{
+    const ok = await savePayslipNow();
+    if (!ok) return;
+    toast(`Payslip B saved for ${titleCase(MONTHS[currentMonth])} ${currentYear} — back to Payslip A`);
+    await switchVariant('A');
   });
 
   document.getElementById('deletePayslipBtn').addEventListener('click', async ()=>{
@@ -1521,6 +1536,18 @@
     window.print();
   }
 
+  async function getPayslipCarryForward(companyId, staffId, year, month, variant, maxLookback){
+    maxLookback = maxLookback || 12;
+    let y = year, m = month;
+    for (let i=0; i<=maxLookback; i++){
+      let pay;
+      try{ pay = await dbGetPayslip(companyId, staffId, y, m, variant); }catch(e){ pay = null; }
+      if (pay && AMOUNT_FIELDS.some(k=>parseFloat(pay[k])>0)) return pay;
+      m--; if (m < 0){ m = 11; y--; }
+    }
+    return null;
+  }
+
   async function runPrintCurrent(){
     const staff = staffList.find(s=>s.id===currentStaffId);
     const co = companies.find(c=>c.id===currentCompanyId);
@@ -1528,8 +1555,8 @@
 
     let payA, payB;
     try{
-      payA = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, 'A');
-      payB = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, 'B');
+      payA = await getPayslipCarryForward(currentCompanyId, currentStaffId, currentYear, currentMonth, 'A');
+      payB = await getPayslipCarryForward(currentCompanyId, currentStaffId, currentYear, currentMonth, 'B');
     }catch(e){ toast('Could not load payslip data: ' + e.message, true); payA = null; payB = null; }
 
     const hasA = payA && AMOUNT_FIELDS.some(k=>parseFloat(payA[k])>0);
@@ -1582,8 +1609,8 @@
     const slips = []; // {label, html}
     for (const staff of staffList){
       let payA, payB;
-      try{ payA = await dbGetPayslip(currentCompanyId, staff.id, year, month, 'A'); }catch(e){ payA = null; }
-      try{ payB = await dbGetPayslip(currentCompanyId, staff.id, year, month, 'B'); }catch(e){ payB = null; }
+      try{ payA = await getPayslipCarryForward(currentCompanyId, staff.id, year, month, 'A'); }catch(e){ payA = null; }
+      try{ payB = await getPayslipCarryForward(currentCompanyId, staff.id, year, month, 'B'); }catch(e){ payB = null; }
       const hasA = payA && AMOUNT_FIELDS.some(k=>parseFloat(payA[k])>0);
       const hasB = payB && AMOUNT_FIELDS.some(k=>parseFloat(payB[k])>0);
       if (!hasA && !hasB) continue;
@@ -1728,8 +1755,8 @@
   document.getElementById('annualPrintBtn').addEventListener('click', ()=>window.print());
 
   // ---------------- All Staff — view & edit everyone on one page ----------------
-  const AF_FIELDS = ['basicSalary','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct'];
-  const AF_LABELS = { basicSalary:'Base rate', meal:'Meal', nightShift:'Night shift', normalOT:'Normal OT', restOT:'Rest OT', commission:'Commission', bonus:'Bonus', unpaidLeave:'Unpaid leave', pcb:'PCB', cp38:'CP38', otherDeduct:'Other deduct' };
+  const AF_FIELDS = ['basicSalary','workingDays','daysWorked','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct'];
+  const AF_LABELS = { basicSalary:'Base rate', workingDays:'Working days', daysWorked:'Days worked', meal:'Meal', nightShift:'Night shift', normalOT:'Normal OT', restOT:'Rest OT', commission:'Commission', bonus:'Bonus', unpaidLeave:'Unpaid leave', pcb:'PCB', cp38:'CP38', otherDeduct:'Other deduct' };
 
   async function renderAllStaff(){
     if (!currentCompanyId) return;
@@ -1748,6 +1775,10 @@
       let pay;
       try{ pay = await dbGetPayslip(currentCompanyId, staff.id, year, month); }catch(e){ pay = null; }
       pay = pay || {};
+      if (!pay.workingDays || parseFloat(pay.workingDays) <= 0){
+        const daysInMonth = new Date(year, month+1, 0).getDate();
+        pay = Object.assign({}, pay, { workingDays: daysInMonth, daysWorked: pay.daysWorked || daysInMonth });
+      }
       const calc = calcStatutory(staff, pay, co, {year, month});
       const isOv = pay.overrideDeductions === 'yes';
       cardsHtml.push(`
