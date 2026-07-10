@@ -358,7 +358,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbz8hY9nZAWdB9QA4eONb2aGgqn4TyEYTPhEEwMwmP7ND8_gNEtpyXfVbO46uzmWb9Th/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbz0g8zTFd0Jy9DW-IsgLhWtuEnS7z-8zBy2xG4mUwDwYZOZSO7MYKbnzELzR8LfESVp/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -1390,29 +1390,49 @@
   });
   window.addEventListener('afterprint', ()=>{ document.body.classList.remove('duo-mode'); });
 
+  function slipBlock(label, html){
+    return (label ? `<div class="copy-label">${label}</div>` : '') + `<div class="payslip compact batch-only">${html}</div>`;
+  }
+
   document.getElementById('printAllBtn').addEventListener('click', async ()=>{
     if (!currentCompanyId || staffList.length===0) return;
     const co = companies.find(c=>c.id===currentCompanyId);
     const year = parseInt(document.getElementById('payYear').value)||currentYear;
     const month = parseInt(monthSel.value);
+    const period = {year, month};
     const batch = document.getElementById('batchPrintArea');
     batch.innerHTML = '';
-    const slips = [];
+    const slips = []; // {label, html}
     for (const staff of staffList){
-      let pay;
-      try{ pay = await dbGetPayslip(currentCompanyId, staff.id, year, month); }catch(e){ continue; }
-      if (!pay) continue;
-      const hasAnyPay = AMOUNT_FIELDS.some(k=>parseFloat(pay[k])>0);
-      if (!hasAnyPay) continue;
-      const calc = calcStatutory(staff, pay, co, {year, month});
-      slips.push(buildPayslipHTML(co, staff, {year, month}, calc, {}));
+      let payA, payB;
+      try{ payA = await dbGetPayslip(currentCompanyId, staff.id, year, month, 'A'); }catch(e){ payA = null; }
+      try{ payB = await dbGetPayslip(currentCompanyId, staff.id, year, month, 'B'); }catch(e){ payB = null; }
+      const hasA = payA && AMOUNT_FIELDS.some(k=>parseFloat(payA[k])>0);
+      const hasB = payB && AMOUNT_FIELDS.some(k=>parseFloat(payB[k])>0);
+      if (!hasA && !hasB) continue;
+
+      if (hasA && hasB){
+        const calcA = calcStatutory(staff, payA, co, period);
+        const calcB = calcStatutory(staff, payB, co, period);
+        const sameAmount = Math.abs(calcA.netSalary - calcB.netSalary) < 0.01 && Math.abs(calcA.totalEarnings - calcB.totalEarnings) < 0.01;
+        if (sameAmount){
+          slips.push({label:'', html: buildPayslipHTML(co, staff, period, calcB, {})});
+        } else {
+          slips.push({label:`${staff.empName} — Payslip A`, html: buildPayslipHTML(co, staff, period, calcA, {})});
+          slips.push({label:`${staff.empName} — Payslip B`, html: buildPayslipHTML(co, staff, period, calcB, {})});
+        }
+      } else {
+        const only = hasA ? payA : payB;
+        const calc = calcStatutory(staff, only, co, period);
+        slips.push({label:'', html: buildPayslipHTML(co, staff, period, calc, {})});
+      }
     }
     if (slips.length===0){ toast(`No saved payslips found for ${titleCase(MONTHS[month])} ${year} at this company`); return; }
     for (let i=0; i<slips.length; i+=2){
       const page = document.createElement('div');
       page.className = 'print-page batch-only';
-      let inner = `<div class="payslip compact batch-only">${slips[i]}</div>`;
-      if (slips[i+1]) inner += `<div class="cut-line"><span>✂ cut here</span></div><div class="payslip compact batch-only">${slips[i+1]}</div>`;
+      let inner = slipBlock(slips[i].label, slips[i].html);
+      if (slips[i+1]) inner += `<div class="cut-line"><span>✂ cut here</span></div>` + slipBlock(slips[i+1].label, slips[i+1].html);
       page.innerHTML = inner;
       batch.appendChild(page);
     }
