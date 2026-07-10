@@ -180,8 +180,10 @@
   #duoPrintArea{ display:none; }
 
   /* ---- 2-up A4 print layout ---- */
-  @page{ size:A4; margin:9mm; }
-  .print-page{ display:flex; flex-direction:column; gap:0; }
+  @page{ size:A4; margin:6mm; }
+  .print-page{ display:flex; flex-direction:column; gap:0; width:198mm; }
+  .payslip.compact{ width:198mm; min-height:139mm; box-sizing:border-box; display:flex; flex-direction:column; }
+  .payslip.compact .ps-col-body{ flex:1; }
   .payslip.compact{ font-size:.86em; margin-bottom:0; padding:16px 20px; }
   .payslip.compact .ps-header{ margin-bottom:8px; gap:10px; }
   .payslip.compact .ps-logo{ width:36px; height:36px; font-size:14px; }
