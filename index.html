@@ -369,7 +369,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbzax7MrfbIsTt4W7qdkNIsGSyEi7Pjt_-uI9PMuvsOOdQYhccXHIw94tsXCA5AvfvLQ/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -2038,7 +2038,7 @@
   // NOTE: this is a light deterrent, not real security — anyone who can view this
   // page's source can see APP_PASSWORD. The Google Sheet backend's own secret key
   // check (see gaji-sheets-backend.gs) is what actually protects your data.
-  const APP_PASSWORD = "Fuckyou3456@"; // <-- change this to your own password
+  const APP_PASSWORD = "changeme"; // <-- change this to your own password
   const LOCK_KEY = 'gaji_unlocked';
 
   function unlockApp(){
