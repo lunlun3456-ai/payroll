@@ -716,6 +716,53 @@
     return 0.0125;
   }
 
+  // PERKESO official banded contribution table (Act 4), sourced directly from:
+  // "New Contribution Rate Including the Non-Employment Injury Security Scheme (SKBBK)"
+  // https://www.perkeso.gov.my/images/lindung/lindung-24-jam/NewContributionRateIncludingSKBBK.pdf
+  // Each row: [wage upper bound, Cat1 employer, Cat1 employee-invalidity, Cat1 employee-LINDUNG,
+  //            Cat2 employer, Cat2 employee-LINDUNG]
+  // The LINDUNG columns in this table reflect Phase 1 (0.75%) — see lindungRate() above for the
+  // phased schedule; amounts are scaled proportionally once Phase 2/3 kicks in, since PERKESO has
+  // not yet published official tables beyond Phase 1.
+  const SOCSO_TABLE = [
+    [30,0.40,0.10,0.20,0.30,0.20],[50,0.70,0.20,0.30,0.50,0.30],[70,1.10,0.30,0.50,0.80,0.50],
+    [100,1.50,0.40,0.65,1.10,0.65],[140,2.10,0.60,0.90,1.50,0.90],[200,2.95,0.85,1.25,2.10,1.25],
+    [300,4.35,1.25,1.85,3.10,1.85],[400,6.15,1.75,2.65,4.40,2.65],[500,7.85,2.25,3.35,5.60,3.35],
+    [600,9.65,2.75,4.15,6.90,4.15],[700,11.35,3.25,4.85,8.10,4.85],[800,13.15,3.75,5.65,9.40,5.65],
+    [900,14.85,4.25,6.35,10.60,6.35],[1000,16.65,4.75,7.15,11.90,7.15],[1100,18.35,5.25,7.85,13.10,7.85],
+    [1200,20.15,5.75,8.65,14.40,8.65],[1300,21.85,6.25,9.35,15.60,9.35],[1400,23.65,6.75,10.15,16.90,10.15],
+    [1500,25.35,7.25,10.85,18.10,10.85],[1600,27.15,7.75,11.65,19.40,11.65],[1700,28.85,8.25,12.35,20.60,12.35],
+    [1800,30.65,8.75,13.15,21.90,13.15],[1900,32.35,9.25,13.85,23.10,13.85],[2000,34.15,9.75,14.65,24.40,14.65],
+    [2100,35.85,10.25,15.35,25.60,15.35],[2200,37.65,10.75,16.15,26.90,16.15],[2300,39.35,11.25,16.85,28.10,16.85],
+    [2400,41.15,11.75,17.65,29.40,17.65],[2500,42.85,12.25,18.35,30.60,18.35],[2600,44.65,12.75,19.15,31.90,19.15],
+    [2700,46.35,13.25,19.85,33.10,19.85],[2800,48.15,13.75,20.65,34.40,20.65],[2900,49.85,14.25,21.35,35.60,21.35],
+    [3000,51.65,14.75,22.15,36.90,22.15],[3100,53.35,15.25,22.85,38.10,22.85],[3200,55.15,15.75,23.65,39.40,23.65],
+    [3300,56.85,16.25,24.35,40.60,24.35],[3400,58.65,16.75,25.15,41.90,25.15],[3500,60.35,17.25,25.85,43.10,25.85],
+    [3600,62.15,17.75,26.65,44.40,26.65],[3700,63.85,18.25,27.35,45.60,27.35],[3800,65.65,18.75,28.15,46.90,28.15],
+    [3900,67.35,19.25,28.85,48.10,28.85],[4000,69.15,19.75,29.65,49.40,29.65],[4100,70.85,20.25,30.35,50.60,30.35],
+    [4200,72.65,20.75,31.15,51.90,31.15],[4300,74.35,21.25,31.85,53.10,31.85],[4400,76.15,21.75,32.65,54.40,32.65],
+    [4500,77.85,22.25,33.35,55.60,33.35],[4600,79.65,22.75,34.15,56.90,34.15],[4700,81.35,23.25,34.85,58.10,34.85],
+    [4800,83.15,23.75,35.65,59.40,35.65],[4900,84.85,24.25,36.35,60.60,36.35],[5000,86.65,24.75,37.15,61.90,37.15],
+    [5100,88.35,25.25,37.85,63.10,37.85],[5200,90.15,25.75,38.65,64.40,38.65],[5300,91.85,26.25,39.35,65.60,39.35],
+    [5400,93.65,26.75,40.15,66.90,40.15],[5500,95.35,27.25,40.85,68.10,40.85],[5600,97.15,27.75,41.65,69.40,41.65],
+    [5700,98.85,28.25,42.35,70.60,42.35],[5800,100.65,28.75,43.15,71.90,43.15],[5900,102.35,29.25,43.85,73.10,43.85],
+    [6000,104.15,29.75,44.65,74.40,44.65]
+  ];
+  function socsoBandIndex(wage){
+    if (wage <= 0) return 0;
+    for (let i=0;i<SOCSO_TABLE.length;i++){ if (wage <= SOCSO_TABLE[i][0]) return i; }
+    return SOCSO_TABLE.length-1; // capped at RM6,000 band
+  }
+  // EIS (Act 800) isn't a clean percentage either — PERKESO's official EIS PDF has no extractable
+  // table, so this uses 0.2% of each band's midpoint (same bands as the SOCSO table above), which
+  // was verified to exactly reproduce three independently-confirmed reference points: RM8.90 at the
+  // RM4,400.01–4,500.00 band, RM10.90 at RM5,400.01–5,500.00, and the RM11.90 cap at RM6,000+.
+  function eisFromBandIndex(idx){
+    const upper = SOCSO_TABLE[idx][0];
+    const lower = idx===0 ? 0 : SOCSO_TABLE[idx-1][0];
+    return Math.round(((lower+upper)/2) * 0.002 * 100)/100;
+  }
+
   // KWSP Third Schedule (effective 1 Oct 2025), replicated as a formula rather than a
   // hardcoded 2,000-row table. Verified against the official published table:
   //  - Wages ≤ RM5,000: banded in RM20 steps, contribution = ceil(rate × band-upper-bound)
@@ -786,15 +833,18 @@
     let epfEmployee = epfResult.employee;
     let epfEmployer = epfResult.employer;
 
+    const bandIdx = socsoBandIndex(socsoWage);
+    const socsoRow = SOCSO_TABLE[bandIdx];
     let socsoEmployee, socsoEmployer;
-    if (over60){ socsoEmployee = 0; socsoEmployer = Math.round(socsoWage * 0.0125 * 100)/100; }
-    else { socsoEmployee = Math.round(socsoWage * 0.005 * 100)/100; socsoEmployer = Math.round(socsoWage * 0.0175 * 100)/100; }
+    if (over60){ socsoEmployee = 0; socsoEmployer = socsoRow[4]; }
+    else { socsoEmployer = socsoRow[1]; socsoEmployee = socsoRow[2]; }
 
     let eisEmployee = 0, eisEmployer = 0;
-    if (!over60 && !foreign){ eisEmployee = Math.round(eisWage * 0.002 * 100)/100; eisEmployer = Math.round(eisWage * 0.002 * 100)/100; }
+    if (!over60 && !foreign){ const eisAmt = eisFromBandIndex(bandIdx); eisEmployee = eisAmt; eisEmployer = eisAmt; }
 
     const lRate = lindungRate(period.year, period.month);
-    let lindungAmount = Math.round(socsoWage * lRate * 100)/100;
+    const lindungBase = over60 ? socsoRow[5] : socsoRow[3]; // official table value at Phase 1 (0.75%)
+    let lindungAmount = Math.round(lindungBase * (lRate/0.0075) * 100)/100;
 
     // Manual override: fixed RM amounts on the employee side, in place of the auto-calculated figures.
     // Employer-side overrides are optional — left blank, they keep auto-calculating from actual earnings (statutory-accurate for filing).
@@ -1282,15 +1332,18 @@
     const epfEmployee = epfResult.employee;
     const epfEmployer = epfResult.employer;
 
+    const bandIdx = socsoBandIndex(socsoWage);
+    const socsoRow = SOCSO_TABLE[bandIdx];
     let socsoEmployee, socsoEmployer;
-    if (over60){ socsoEmployee = 0; socsoEmployer = Math.round(socsoWage * 0.0125 * 100)/100; }
-    else { socsoEmployee = Math.round(socsoWage * 0.005 * 100)/100; socsoEmployer = Math.round(socsoWage * 0.0175 * 100)/100; }
+    if (over60){ socsoEmployee = 0; socsoEmployer = socsoRow[4]; }
+    else { socsoEmployer = socsoRow[1]; socsoEmployee = socsoRow[2]; }
 
     let eisEmployee = 0, eisEmployer = 0;
-    if (!over60 && !foreign){ eisEmployee = Math.round(socsoWage * 0.002 * 100)/100; eisEmployer = Math.round(socsoWage * 0.002 * 100)/100; }
+    if (!over60 && !foreign){ const eisAmt = eisFromBandIndex(bandIdx); eisEmployee = eisAmt; eisEmployer = eisAmt; }
 
     const lRate = lindungRate(period.year, period.month);
-    const lindungAmount = Math.round(socsoWage * lRate * 100)/100;
+    const lindungBase = over60 ? socsoRow[5] : socsoRow[3];
+    const lindungAmount = Math.round(lindungBase * (lRate/0.0075) * 100)/100;
 
     return { epfEmployee, epfEmployer, socsoEmployee, socsoEmployer, eisEmployee, eisEmployer, lindungAmount };
   }
