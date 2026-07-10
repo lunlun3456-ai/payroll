@@ -11,6 +11,16 @@
     --shadow: 0 1px 2px rgba(15,36,56,.06), 0 8px 24px rgba(15,36,56,.06);
   }
   *{box-sizing:border-box;}
+  /* Universal press effect for every clickable control */
+  button, .co-chip, .add-chip, .staff-item, .history-chip, .add-staff-btn,
+  .variant-tab, .af-head, .lock-card button{
+    transition: transform .08s ease, opacity .08s ease;
+  }
+  button:active:not(:disabled), .co-chip:active, .add-chip:active, .staff-item:active,
+  .history-chip:active, .add-staff-btn:active, .variant-tab:active, .af-head:active{
+    transform: scale(0.96);
+    opacity: .9;
+  }
   body{ margin:0; background: var(--paper); color: var(--ink); font-family: "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; }
   .app{ display:grid; grid-template-columns: 320px 1fr; min-height:100vh; }
 
@@ -359,7 +369,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbx7L3kRw83VwOlTo2m6IvrscAN4OzinYzKPOAvsNhmThtoa6ZVBoKYgce8g0u3KJFCt/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbyYGUFASwc5Lv8r6_G9X9xFfTYIVyHUSVxgkXCkZbcC72Zg-UC3qharfoz-QIeFkqgp/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -383,6 +393,7 @@
       <div class="fc-sub">Company details appear on every payslip you generate.</div>
       <div class="fc-group"><label class="fc-label">Company name</label><input type="text" class="fc-input" id="companyName" placeholder="e.g. Demo Company Sdn Bhd"></div>
       <div class="fc-group"><label class="fc-label">Address</label><input type="text" class="fc-input" id="companyAddr" placeholder="Address, city, state"></div>
+      <div class="fc-group"><label class="fc-label">Company registration no.</label><input type="text" class="fc-input" id="companyRegNo" placeholder="e.g. 202301012345"></div>
       <div class="fc-group"><label class="fc-label">SSM registration no.</label><input type="text" class="fc-input" id="companySsm" placeholder="e.g. 002628025-K"></div>
       <div class="fc-group"><label class="fc-label">Employer EPF / SOCSO / EIS No.</label><input type="text" class="fc-input" id="companyRefs" placeholder="e.g. E12345678 / S987654"></div>
       <div class="fc-group" style="display:flex; align-items:center; gap:10px;">
@@ -475,6 +486,17 @@
         <div class="fc-group"><label class="fc-label">Other deduction (RM)</label><input type="number" class="fc-input" id="otherDeduct" placeholder="0.00" step="0.01"></div>
       </div>
       <div class="fc-group"><label class="fc-label">CP38 instalment (RM)</label><input type="number" class="fc-input" id="cp38" placeholder="0.00" step="0.01"></div>
+
+      <div class="fc-section-title">Statutory deduction exemptions</div>
+      <div class="fc-sub" style="margin:-4px 0 12px; font-size:12px;">Tick any that genuinely don't apply to this staff member — the relevant deduction (both employee and employer share) will be forced to zero regardless of salary.</div>
+      <div class="fc-grid2" style="margin-bottom:4px;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox" id="exemptEpf" style="width:17px; height:17px; accent-color:#b8863c;"> No EPF deduction</label>
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox" id="exemptSocso" style="width:17px; height:17px; accent-color:#b8863c;"> No SOCSO deduction</label>
+      </div>
+      <div class="fc-grid2" style="margin-bottom:18px;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox" id="exemptEis" style="width:17px; height:17px; accent-color:#b8863c;"> No EIS deduction</label>
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox" id="exemptLindung" style="width:17px; height:17px; accent-color:#b8863c;"> No LINDUNG 24 Jam deduction</label>
+      </div>
 
       <div class="fc-section-title">Statutory deduction override</div>
       <div class="fc-group" style="display:flex; align-items:center; gap:10px;">
@@ -859,6 +881,12 @@
       if (pay.customEisEmployer !== undefined && pay.customEisEmployer !== '') eisEmployer = parseFloat(pay.customEisEmployer)||0;
     }
 
+    // Exemptions take final precedence over everything above — both employee and employer shares are zeroed.
+    if (pay.exemptEpf === 'yes'){ epfEmployee = 0; epfEmployer = 0; }
+    if (pay.exemptSocso === 'yes'){ socsoEmployee = 0; socsoEmployer = 0; }
+    if (pay.exemptEis === 'yes'){ eisEmployee = 0; eisEmployer = 0; }
+    if (pay.exemptLindung === 'yes'){ lindungAmount = 0; }
+
     const earnings = [
       ['BASIC PAY', basic],
       dailyAttendance ? ['DAILY ATTENDANCE', dailyAttendance] : null,
@@ -902,6 +930,7 @@
     opts = opts || {};
     const initial = (company.companyName||'?').trim().charAt(0).toUpperCase() || '?';
     const addrLine = (company.companyAddr||'').trim();
+    const regLine = (company.regNo||'').trim();
     const ssmLine = (company.ssmNo||'').trim();
     const printedDate = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric'}).replace(/\//g,'-');
 
@@ -913,6 +942,7 @@
           ${addrLine ? `<div class="ps-address">${esc(addrLine)}</div>` : ''}
         </div>
         <div>
+          ${regLine ? `<div class="ps-ssm">Reg. No : ${esc(regLine)}</div>` : ''}
           ${ssmLine ? `<div class="ps-ssm">SSM No : ${esc(ssmLine)}</div>` : ''}
           ${opts.dirty ? '<div class="ps-draft">Unsaved changes</div>' : ''}
         </div>
@@ -1022,6 +1052,7 @@
     document.getElementById('companyFormTitle').textContent = 'Add company';
     document.getElementById('companyName').value='';
     document.getElementById('companyAddr').value='';
+    document.getElementById('companyRegNo').value='';
     document.getElementById('companySsm').value='';
     document.getElementById('companyRefs').value='';
     document.getElementById('companyHrdf').checked=false;
@@ -1036,6 +1067,7 @@
     document.getElementById('companyFormTitle').textContent = 'Edit company';
     document.getElementById('companyName').value = co.companyName||'';
     document.getElementById('companyAddr').value = co.companyAddr||'';
+    document.getElementById('companyRegNo').value = co.regNo||'';
     document.getElementById('companySsm').value = co.ssmNo||'';
     document.getElementById('companyRefs').value = co.companyRefs||'';
     document.getElementById('companyHrdf').checked = co.hrdfRegistered === 'yes';
@@ -1048,6 +1080,7 @@
     const data = {
       companyName: document.getElementById('companyName').value.trim(),
       companyAddr: document.getElementById('companyAddr').value.trim(),
+      regNo: document.getElementById('companyRegNo').value.trim(),
       ssmNo: document.getElementById('companySsm').value.trim(),
       companyRefs: document.getElementById('companyRefs').value.trim(),
       hrdfRegistered: document.getElementById('companyHrdf').checked ? 'yes' : '',
@@ -1108,6 +1141,10 @@
     const o = {};
     PAY_FIELDS.forEach(id=>{ o[id] = document.getElementById(id).value; });
     o.overrideDeductions = document.getElementById('overrideDeductions').checked ? 'yes' : '';
+    o.exemptEpf = document.getElementById('exemptEpf').checked ? 'yes' : '';
+    o.exemptSocso = document.getElementById('exemptSocso').checked ? 'yes' : '';
+    o.exemptEis = document.getElementById('exemptEis').checked ? 'yes' : '';
+    o.exemptLindung = document.getElementById('exemptLindung').checked ? 'yes' : '';
     return o;
   }
   function fillProfileForm(staff){
@@ -1127,6 +1164,10 @@
     const isOverride = pay && pay.overrideDeductions === 'yes';
     document.getElementById('overrideDeductions').checked = !!isOverride;
     document.getElementById('overrideFields').style.display = isOverride ? 'block' : 'none';
+    document.getElementById('exemptEpf').checked = !!(pay && pay.exemptEpf === 'yes');
+    document.getElementById('exemptSocso').checked = !!(pay && pay.exemptSocso === 'yes');
+    document.getElementById('exemptEis').checked = !!(pay && pay.exemptEis === 'yes');
+    document.getElementById('exemptLindung').checked = !!(pay && pay.exemptLindung === 'yes');
     checkProrationOverrideConflict();
   }
   function checkProrationOverrideConflict(){
@@ -1222,10 +1263,20 @@
     container.appendChild(div);
   }
 
+  function generateNextStaffNo(){
+    let maxNum = 0;
+    staffList.forEach(s=>{
+      const match = (s.empNo||'').match(/(\d+)$/);
+      if (match){ const n = parseInt(match[1]); if (n > maxNum) maxNum = n; }
+    });
+    return String(maxNum + 1).padStart(3, '0');
+  }
+
   document.getElementById('addStaffBtn').addEventListener('click', ()=>{
     currentStaffId = null;
     document.getElementById('staffFormTitle').textContent = 'Add staff';
     fillProfileForm({});
+    document.getElementById('empNo').value = generateNextStaffNo();
     document.getElementById('deleteStaffBtn').style.display='none';
     renderStaffList();
     showView('staff');
