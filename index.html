@@ -683,7 +683,7 @@
 
   // ---------------- API layer ----------------
   // Must match APP_SECRET in gaji-sheets-backend.gs exactly, or every request will be rejected.
-  const APP_SECRET = "changeme-secret";
+  const APP_SECRET = "Fuckyou3456@";
 
   async function apiCall(action, params, body){
     if (!API_URL) throw new Error('Not connected to a database yet.');
@@ -2038,7 +2038,7 @@
   // NOTE: this is a light deterrent, not real security — anyone who can view this
   // page's source can see APP_PASSWORD. The Google Sheet backend's own secret key
   // check (see gaji-sheets-backend.gs) is what actually protects your data.
-  const APP_PASSWORD = "changeme"; // <-- change this to your own password
+  const APP_PASSWORD = "Fuckyou3456@"; // <-- change this to your own password
   const LOCK_KEY = 'gaji_unlocked';
 
   function unlockApp(){
