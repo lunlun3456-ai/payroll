@@ -130,6 +130,8 @@
   .ps-bottom-row{ display:grid; grid-template-columns:1fr 1fr; gap:0 30px; font-size:12.5px; padding:3px 0; }
   .ps-bottom-row.strong{ font-weight:700; }
   .ps-bottom-row .bl{ display:flex; justify-content:space-between; }
+  .ps-empsign{ margin-top:26px; padding-top:16px; border-top:1px solid #111; font-size:12px; display:flex; align-items:flex-end; gap:12px; }
+  .ps-empsign .sign-line{ flex:1; max-width:240px; border-bottom:1px solid #111; height:20px; }
   .ps-edit-hint{ width:100%; max-width:800px; display:flex; justify-content:flex-end; margin:-10px 0 14px; }
   .ps-edit-hint button{ background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:8px 14px; border-radius:7px; font-size:12.5px; cursor:pointer; font-family:inherit; }
   .ps-edit-hint button:hover{ border-color:var(--gold); color:var(--gold-deep); }
@@ -149,6 +151,24 @@
   .annual-stat{ flex:1; min-width:140px; background:#f8f5ee; border:1px solid var(--line); border-radius:8px; padding:14px 16px; }
   .annual-stat .lbl{ font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--ink-soft); margin-bottom:4px; }
   .annual-stat .val{ font-size:18px; font-weight:700; color:var(--ink); }
+
+  .af-card{ border:1px solid var(--line); border-radius:10px; margin-bottom:14px; overflow:hidden; }
+  .af-head{ display:flex; justify-content:space-between; align-items:center; padding:12px 18px; background:#f8f5ee; cursor:pointer; gap:12px; flex-wrap:wrap; }
+  .af-head .name{ font-weight:700; font-size:14px; }
+  .af-head .role{ font-size:11.5px; color:var(--ink-soft); font-weight:400; margin-left:8px; }
+  .af-head .net{ font-size:13px; font-weight:700; color:var(--green); }
+  .af-head .chev{ font-size:11px; color:var(--ink-soft); }
+  .af-body{ padding:16px 18px 18px; display:none; border-top:1px solid var(--line); }
+  .af-card.open .af-body{ display:block; }
+  .af-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:12px; }
+  .af-field label{ display:block; font-size:10px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink-soft); margin-bottom:4px; }
+  .af-field input{ width:100%; padding:7px 8px; border-radius:6px; border:1px solid var(--line); font-size:12.5px; font-family:inherit; }
+  .af-field input:focus{ outline:none; border-color:var(--gold); }
+  .af-override{ display:flex; align-items:center; gap:8px; font-size:12px; margin:10px 0; }
+  .af-actions{ display:flex; gap:8px; margin-top:12px; }
+  .af-actions button{ padding:8px 16px; border-radius:7px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:inherit; border:none; }
+  .af-save{ background:linear-gradient(180deg,var(--gold),var(--gold-deep)); color:#1c1204; }
+  .af-samelast{ background:rgba(184,134,60,.12); border:1px solid var(--gold) !important; color:var(--gold-deep); }
 
   .placeholder{ width:100%; max-width:800px; background:var(--panel); border:1px dashed var(--line); border-radius:8px; padding:60px 30px; text-align:center; color:var(--ink-soft); }
   .placeholder h2{ font-family:"Iowan Old Style","Georgia",serif; color:var(--ink); margin-bottom:8px; }
@@ -197,6 +217,8 @@
   .payslip.compact .ps-net-line{ margin-top:8px; padding-top:4px; }
   .payslip.compact .ps-bottom{ margin-top:10px; padding-top:5px; }
   .payslip.compact .ps-bottom-row{ font-size:9.5px; padding:2px 0; }
+  .payslip.compact .ps-empsign{ margin-top:10px; padding-top:6px; font-size:9.5px; gap:8px; }
+  .payslip.compact .ps-empsign .sign-line{ max-width:150px; height:12px; }
   .copy-label{ text-align:center; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:#888; padding:4px 0; }
   .cut-line{ position:relative; text-align:center; margin:2mm 0; border-top:1px dashed #999; }
   .cut-line span{ position:absolute; top:-7px; left:50%; transform:translateX(-50%); background:#fff; padding:0 8px; font-size:8.5px; color:#999; letter-spacing:1px; }
@@ -256,6 +278,7 @@
         <div class="staff-list" id="staffList"></div>
         <div class="empty-note" id="staffEmpty">No staff yet for this company.</div>
         <button class="side-btn" id="addStaffBtn">+ Add new staff</button>
+        <button class="side-btn" id="viewAllStaffBtn" style="margin-top:8px;">👥 View &amp; edit all staff</button>
         <button class="side-btn solid" id="editCompanyBtn">Edit company details</button>
       </div>
 
@@ -422,6 +445,21 @@
       </div>
       <div class="fc-group"><label class="fc-label">CP38 instalment (RM)</label><input type="number" class="fc-input" id="cp38" placeholder="0.00" step="0.01"></div>
 
+      <div class="fc-section-title">Statutory deduction override</div>
+      <div class="fc-group" style="display:flex; align-items:center; gap:10px;">
+        <input type="checkbox" id="overrideDeductions" style="width:18px; height:18px; accent-color:#b8863c;">
+        <label class="fc-label" style="margin:0;" for="overrideDeductions">Use fixed RM amounts below instead of auto-calculating EPF/SOCSO/EIS/LINDUNG from salary</label>
+      </div>
+      <div id="overrideFields" style="display:none;">
+        <div class="fc-sub" style="margin:-4px 0 14px; font-size:12px;">Employer contributions still auto-calculate normally — this only fixes what's shown/deducted on the employee's side.</div>
+        <div class="fc-grid3">
+          <div class="fc-group"><label class="fc-label">EPF (RM)</label><input type="number" class="fc-input" id="customEpf" placeholder="0.00" step="0.01"></div>
+          <div class="fc-group"><label class="fc-label">SOCSO (RM)</label><input type="number" class="fc-input" id="customSocso" placeholder="0.00" step="0.01"></div>
+          <div class="fc-group"><label class="fc-label">EIS (RM)</label><input type="number" class="fc-input" id="customEis" placeholder="0.00" step="0.01"></div>
+        </div>
+        <div class="fc-group"><label class="fc-label">LINDUNG 24 Jam (RM)</label><input type="number" class="fc-input" id="customLindung" placeholder="0.00" step="0.01"></div>
+      </div>
+
       <div class="fc-section-title">Leave record (for reference on payslip)</div>
       <div class="fc-grid3">
         <div class="fc-group"><label class="fc-label">Annual leave taken (days)</label><input type="number" class="fc-input" id="alTaken" placeholder="0" step="0.5"></div>
@@ -470,6 +508,22 @@
       </div>
       <div id="annualBody"></div>
     </div>
+
+    <!-- ===== All Staff — view & edit everyone inline ===== -->
+    <div class="report-card" id="allStaffCard" style="display:none; max-width:940px;">
+      <div class="report-head">
+        <div>
+          <h2>All staff — this period</h2>
+          <div class="fc-sub" id="allStaffSub"></div>
+        </div>
+        <div class="toolbar-actions">
+          <select id="allStaffMonth" class="btn-outline" style="cursor:pointer;"></select>
+          <input type="number" id="allStaffYear" class="btn-outline" style="width:80px; cursor:text;">
+          <button class="fc-btn ghost" id="allStaffBackBtn">Back</button>
+        </div>
+      </div>
+      <div id="allStaffBody"></div>
+    </div>
   </div>
 </div>
 
@@ -483,8 +537,12 @@
   const titleCase = (s) => s[0] + s.slice(1).toLowerCase();
   const monthSel = document.getElementById('payMonth');
   MONTHS.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=titleCase(m); monthSel.appendChild(o); });
+  const allStaffMonthSel = document.getElementById('allStaffMonth');
+  MONTHS.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=titleCase(m); allStaffMonthSel.appendChild(o); });
+  allStaffMonthSel.value = new Date().getMonth();
+  document.getElementById('allStaffYear').value = new Date().getFullYear();
 
-  const PAY_FIELDS = ['basicSalary','workingDays','daysWorked','eoHours','latHours','tofHours','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct','alTaken','alBalance','alYtd','mcTaken','mcBalance','mcYtd','otherLeave'];
+  const PAY_FIELDS = ['basicSalary','workingDays','daysWorked','eoHours','latHours','tofHours','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct','alTaken','alBalance','alYtd','mcTaken','mcBalance','mcYtd','otherLeave','customEpf','customSocso','customEis','customLindung'];
   const AMOUNT_FIELDS = ['basicSalary','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct'];
   const LS_KEY = 'gaji_apps_script_url';
 
@@ -521,7 +579,7 @@
   }
 
   // ---------------- Main-area view switcher ----------------
-  // views: 'payslip' | 'company' | 'staff' | 'pay' | 'summary' | 'annual'
+  // views: 'payslip' | 'company' | 'staff' | 'pay' | 'summary' | 'annual' | 'allstaff'
   function showView(view){
     document.getElementById('toolbar').style.display = view==='payslip' ? 'flex' : 'none';
     document.getElementById('placeholderView').style.display = 'none';
@@ -532,6 +590,7 @@
     document.getElementById('payFormCard').style.display = view==='pay' ? 'block' : 'none';
     document.getElementById('summaryCard').style.display = view==='summary' ? 'block' : 'none';
     document.getElementById('annualCard').style.display = view==='annual' ? 'block' : 'none';
+    document.getElementById('allStaffCard').style.display = view==='allstaff' ? 'block' : 'none';
     if (view==='payslip') renderPayslip();
     window.scrollTo({top:0, behavior:'smooth'});
   }
@@ -644,7 +703,7 @@
     else if (foreign){ epfEmployeeRate = 0.02; epfEmployerRate = 0.02; }
     else { epfEmployeeRate = 0.11; epfEmployerRate = statutoryWage <= 5000 ? 0.13 : 0.12; }
 
-    const epfEmployee = Math.round(statutoryWage * epfEmployeeRate * 100)/100;
+    let epfEmployee = Math.round(statutoryWage * epfEmployeeRate * 100)/100;
     const epfEmployer = Math.round(statutoryWage * epfEmployerRate * 100)/100;
 
     let socsoEmployee, socsoEmployer;
@@ -655,7 +714,17 @@
     if (!over60 && !foreign){ eisEmployee = Math.round(eisWage * 0.002 * 100)/100; eisEmployer = Math.round(eisWage * 0.002 * 100)/100; }
 
     const lRate = over60 ? 0 : lindungRate(period.year, period.month);
-    const lindungAmount = Math.round(socsoWage * lRate * 100)/100;
+    let lindungAmount = Math.round(socsoWage * lRate * 100)/100;
+
+    // Manual override: fixed RM amounts on the employee side, in place of the auto-calculated figures.
+    // Employer contributions above are left untouched (still statutory-accurate for filing purposes).
+    const isOverride = pay.overrideDeductions === 'yes';
+    if (isOverride){
+      if (pay.customEpf !== undefined && pay.customEpf !== '') epfEmployee = parseFloat(pay.customEpf)||0;
+      if (pay.customSocso !== undefined && pay.customSocso !== '') socsoEmployee = parseFloat(pay.customSocso)||0;
+      if (pay.customEis !== undefined && pay.customEis !== '') eisEmployee = parseFloat(pay.customEis)||0;
+      if (pay.customLindung !== undefined && pay.customLindung !== '') lindungAmount = parseFloat(pay.customLindung)||0;
+    }
 
     const earnings = [
       ['BASIC PAY', basic],
@@ -669,11 +738,12 @@
     ].filter(Boolean);
     const totalEarnings = earnings.reduce((s,r)=>s+r[1],0);
 
+    const mark = (label, custom) => (isOverride && custom !== undefined && custom !== '') ? label + ' *' : label;
     const deductions = [
-      ['EMPLOYEE EPF', epfEmployee],
-      ['EMPLOYEE SOCSO', socsoEmployee],
-      eisEmployee ? ['EMPLOYEE EIS', eisEmployee] : null,
-      lindungAmount ? [`LINDUNG 24 JAM (${(lRate*100).toFixed(2)}%)`, lindungAmount] : null,
+      [mark('EMPLOYEE EPF', pay.customEpf), epfEmployee],
+      [mark('EMPLOYEE SOCSO', pay.customSocso), socsoEmployee],
+      eisEmployee ? [mark('EMPLOYEE EIS', pay.customEis), eisEmployee] : null,
+      lindungAmount ? [mark(`LINDUNG 24 JAM (${(lRate*100).toFixed(2)}%)`, pay.customLindung), lindungAmount] : null,
       pcb ? ['EMPLOYEE PCB', pcb] : null,
       earlyOut ? ['EARLY OUT', earlyOut] : null,
       lateness ? ['LATENESS', lateness] : null,
@@ -689,7 +759,7 @@
     const employerCost = totalEarnings + epfEmployer + socsoEmployer + eisEmployer + hrdfLevy;
 
     return { earnings, deductions, totalEarnings, totalDeductions, netSalary, epfEmployer, socsoEmployer, eisEmployer, hrdfLevy, employerCost,
-      epfEmployee, socsoEmployee, eisEmployee, pcb, cp38, lindungAmount,
+      epfEmployee, socsoEmployee, eisEmployee, pcb, cp38, lindungAmount, isOverride,
       baseRate, workingDays, daysWorked, eoHours, latHours, tofHours, isProrated,
       alTaken: pay.alTaken, alBalance: pay.alBalance, alYtd: pay.alYtd,
       mcTaken: pay.mcTaken, mcBalance: pay.mcBalance, mcYtd: pay.mcYtd, otherLeave: pay.otherLeave };
@@ -755,6 +825,8 @@
         ${calc.eisEmployer ? `<div class="ps-bottom-row"><div class="bl"><span>Employer EIS</span><span>${fmt(calc.eisEmployer)}</span></div><div></div></div>` : ''}
         ${calc.hrdfLevy ? `<div class="ps-bottom-row"><div class="bl"><span>HRDF (E'yer)</span><span>${fmt(calc.hrdfLevy)}</span></div><div></div></div>` : ''}
       </div>
+      ${calc.isOverride ? '<div style="font-size:9.5px; color:#666; margin-top:6px;">* Manually fixed amount (does not follow standard statutory calculation for this payslip).</div>' : ''}
+      <div class="ps-empsign"><span>Employee Sign :</span><span class="sign-line"></span></div>
     `;
   }
 
@@ -902,6 +974,7 @@
   function readPayForm(){
     const o = {};
     PAY_FIELDS.forEach(id=>{ o[id] = document.getElementById(id).value; });
+    o.overrideDeductions = document.getElementById('overrideDeductions').checked ? 'yes' : '';
     return o;
   }
   function fillProfileForm(staff){
@@ -918,7 +991,13 @@
   }
   function fillPayForm(pay){
     PAY_FIELDS.forEach(id=>{ document.getElementById(id).value = pay ? (pay[id]||'') : ''; });
+    const isOverride = pay && pay.overrideDeductions === 'yes';
+    document.getElementById('overrideDeductions').checked = !!isOverride;
+    document.getElementById('overrideFields').style.display = isOverride ? 'block' : 'none';
   }
+  document.getElementById('overrideDeductions').addEventListener('change', (e)=>{
+    document.getElementById('overrideFields').style.display = e.target.checked ? 'block' : 'none';
+  });
 
   async function selectStaff(id){
     currentStaffId = id;
@@ -1265,6 +1344,109 @@
   document.getElementById('annualBtn').addEventListener('click', renderAnnual);
   document.getElementById('annualBackBtn').addEventListener('click', ()=>showView('payslip'));
   document.getElementById('annualPrintBtn').addEventListener('click', ()=>window.print());
+
+  // ---------------- All Staff — view & edit everyone on one page ----------------
+  const AF_FIELDS = ['basicSalary','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct'];
+  const AF_LABELS = { basicSalary:'Base rate', meal:'Meal', nightShift:'Night shift', normalOT:'Normal OT', restOT:'Rest OT', commission:'Commission', bonus:'Bonus', unpaidLeave:'Unpaid leave', pcb:'PCB', cp38:'CP38', otherDeduct:'Other deduct' };
+
+  async function renderAllStaff(){
+    if (!currentCompanyId) return;
+    const co = companies.find(c=>c.id===currentCompanyId);
+    if (!co) return;
+    showView('allstaff');
+    const year = parseInt(document.getElementById('allStaffYear').value)||new Date().getFullYear();
+    const month = parseInt(allStaffMonthSel.value);
+    document.getElementById('allStaffSub').textContent = `${co.companyName||'Company'} — ${staffList.length} staff — click a name to expand and edit`;
+    const body = document.getElementById('allStaffBody');
+    if (staffList.length===0){ body.innerHTML = '<div class="report-empty">No staff yet. Add staff from the sidebar first.</div>'; return; }
+    body.innerHTML = '<div class="report-empty">Loading…</div>';
+
+    const cardsHtml = [];
+    for (const staff of staffList){
+      let pay;
+      try{ pay = await dbGetPayslip(currentCompanyId, staff.id, year, month); }catch(e){ pay = null; }
+      pay = pay || {};
+      const calc = calcStatutory(staff, pay, co, {year, month});
+      const isOv = pay.overrideDeductions === 'yes';
+      cardsHtml.push(`
+        <div class="af-card" data-staff-id="${staff.id}">
+          <div class="af-head">
+            <div><span class="name">${esc(staff.empName||'Unnamed')}</span><span class="role">${esc(staff.empPosition||'')}</span></div>
+            <div style="display:flex; align-items:center; gap:14px;">
+              <span class="net">Net: RM ${fmt(calc.netSalary)}</span>
+              <span class="chev">▾</span>
+            </div>
+          </div>
+          <div class="af-body">
+            <div class="af-grid">
+              ${AF_FIELDS.map(f=>`<div class="af-field"><label>${AF_LABELS[f]}</label><input type="number" step="0.01" data-field="${f}" value="${esc(pay[f]||'')}"></div>`).join('')}
+            </div>
+            <label class="af-override"><input type="checkbox" data-field="overrideDeductions" ${isOv?'checked':''}> Use fixed RM amounts for EPF/SOCSO/EIS/LINDUNG (skip auto-calc)</label>
+            <div class="af-grid af-override-fields" style="${isOv?'':'display:none;'}">
+              <div class="af-field"><label>EPF (RM)</label><input type="number" step="0.01" data-field="customEpf" value="${esc(pay.customEpf||'')}"></div>
+              <div class="af-field"><label>SOCSO (RM)</label><input type="number" step="0.01" data-field="customSocso" value="${esc(pay.customSocso||'')}"></div>
+              <div class="af-field"><label>EIS (RM)</label><input type="number" step="0.01" data-field="customEis" value="${esc(pay.customEis||'')}"></div>
+              <div class="af-field"><label>LINDUNG (RM)</label><input type="number" step="0.01" data-field="customLindung" value="${esc(pay.customLindung||'')}"></div>
+            </div>
+            <div class="af-actions">
+              <button class="af-save">Save</button>
+              <button class="af-samelast">↻ Same as last month</button>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+    body.innerHTML = cardsHtml.join('');
+
+    body.querySelectorAll('.af-card').forEach(card=>{
+      const staffId = card.dataset.staffId;
+      const staff = staffList.find(s=>s.id===staffId);
+      const overrideCb = card.querySelector('input[data-field="overrideDeductions"]');
+      const overrideBox = card.querySelector('.af-override-fields');
+
+      card.querySelector('.af-head').addEventListener('click', ()=> card.classList.toggle('open'));
+
+      function readCardPay(){
+        const p = {};
+        card.querySelectorAll('[data-field]').forEach(inp=>{
+          p[inp.dataset.field] = inp.type==='checkbox' ? (inp.checked?'yes':'') : inp.value;
+        });
+        return p;
+      }
+      function updateNet(){
+        const calc = calcStatutory(staff, readCardPay(), co, {year, month});
+        card.querySelector('.net').textContent = `Net: RM ${fmt(calc.netSalary)}`;
+      }
+      card.querySelectorAll('input[data-field]:not([type=checkbox])').forEach(inp=>inp.addEventListener('input', updateNet));
+      overrideCb.addEventListener('change', ()=>{ overrideBox.style.display = overrideCb.checked ? 'grid' : 'none'; updateNet(); });
+
+      card.querySelector('.af-save').addEventListener('click', async ()=>{
+        try{
+          await dbSavePayslip(currentCompanyId, staffId, year, month, readCardPay());
+          delete staffHistoryCache[currentCompanyId+':'+staffId];
+          toast(`${staff.empName} saved`);
+        }catch(e){ toast('Save failed: ' + e.message, true); }
+      });
+      card.querySelector('.af-samelast').addEventListener('click', async ()=>{
+        let py = month - 1, yy = year;
+        if (py < 0){ py = 11; yy -= 1; }
+        let prev;
+        try{ prev = await dbGetPayslip(currentCompanyId, staffId, yy, py); }catch(e){ prev = null; }
+        if (!prev){ toast(`No payslip found for ${titleCase(MONTHS[py])} ${yy}`); return; }
+        card.querySelectorAll('[data-field]').forEach(inp=>{
+          if (inp.type==='checkbox') inp.checked = prev[inp.dataset.field]==='yes';
+          else inp.value = prev[inp.dataset.field]||'';
+        });
+        overrideBox.style.display = overrideCb.checked ? 'grid' : 'none';
+        updateNet();
+        toast(`Copied ${titleCase(MONTHS[py])} ${yy} — remember to save`);
+      });
+    });
+  }
+  document.getElementById('viewAllStaffBtn').addEventListener('click', renderAllStaff);
+  document.getElementById('allStaffBackBtn').addEventListener('click', ()=>showView('payslip'));
+  document.getElementById('allStaffMonth').addEventListener('change', renderAllStaff);
+  document.getElementById('allStaffYear').addEventListener('change', renderAllStaff);
 
   // ---------------- Connection flow ----------------
   async function connectWith(url){
