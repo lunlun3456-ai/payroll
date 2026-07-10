@@ -106,43 +106,30 @@
   .fc-btn.danger:hover{ background:rgba(163,64,47,.06); }
 
   /* ---- payslip: bordered-box template style ---- */
-  .payslip{ width:100%; max-width:800px; background:#fff; box-shadow: var(--shadow); border:2px solid #111; margin-bottom:20px; font-family: Arial, Helvetica, sans-serif; }
-  .ps-topbox{ display:flex; justify-content:space-between; align-items:center; padding:14px 24px; border-bottom:2px solid #111; }
-  .ps-company{ font-size:19px; font-weight:700; color:#111; }
-  .ps-period{ font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; text-align:right; }
-  .ps-idbox2{ display:grid; grid-template-columns:1fr 1fr; padding:10px 24px; border-bottom:2px solid #111; font-size:12px; }
-  .ps-id-col div{ display:flex; padding:2px 0; }
-  .ps-id-col .lbl{ width:118px; flex-shrink:0; color:#333; font-weight:700; }
-  .ps-attend-row{ display:flex; justify-content:space-between; align-items:flex-end; padding:10px 24px; border-bottom:2px solid #111; font-size:12px; gap:24px; flex-wrap:wrap; }
-  .attend-left{ display:flex; flex-direction:column; gap:4px; }
-  .attend-line{ display:flex; gap:34px; }
-  .attend-line .lbl{ width:110px; font-weight:700; color:#333; }
-  table.attend-table{ border-collapse:collapse; font-size:11px; }
-  table.attend-table th, table.attend-table td{ padding:2px 12px; text-align:center; }
-  table.attend-table th{ font-weight:700; border-bottom:1px solid #999; }
-  .ps-cols{ display:grid; grid-template-columns:1fr 1fr; }
-  .ps-col{ padding:0; }
-  .ps-col.left{ border-right:2px solid #111; }
-  .ps-col-head{ font-size:12.5px; font-weight:700; text-transform:uppercase; padding:9px 20px; border-bottom:2px solid #111; letter-spacing:.5px; }
-  .ps-col-body{ padding:10px 20px; min-height:120px; }
-  .ps-line{ display:flex; justify-content:space-between; font-size:12.5px; padding:5px 0; }
-  .ps-line .l{ text-transform:uppercase; letter-spacing:.2px; }
-  .ps-totals-row{ display:grid; grid-template-columns:1fr 1fr; border-top:2px solid #111; }
-  .ps-totals-cell{ padding:10px 20px; font-size:12.5px; font-weight:700; display:flex; justify-content:space-between; text-transform:uppercase; }
-  .ps-totals-cell.left{ border-right:2px solid #111; }
-  .ps-netpay-row{ display:grid; grid-template-columns:1fr 1fr; border-top:1px solid #111; }
-  .ps-netpay-row .blank{ border-right:2px solid #111; }
-  .ps-netpay-row .val-cell{ padding:10px 20px; display:flex; justify-content:space-between; font-weight:700; font-size:14px; text-transform:uppercase; color:var(--green); }
-  .ps-bottom-row{ display:flex; justify-content:space-between; align-items:flex-start; padding:16px 24px; gap:30px; flex-wrap:wrap; border-top:2px solid #111; }
-  .ps-eyer-box{ border:1.5px solid #111; padding:8px 16px; min-width:220px; }
-  .ps-eyer-box .ps-line{ font-size:12px; }
-  .ps-ytd-box{ font-size:12px; padding-top:4px; }
-  .ps-ytd-box .ps-line{ justify-content:flex-start; gap:16px; }
-  .ps-ytd-box .l{ width:60px; }
-  .ps-sign2{ display:flex; justify-content:space-between; padding:24px 24px 18px; border-top:2px solid #111; font-size:12px; gap:30px; }
-  .ps-sign2 div{ flex:1; }
-  .ps-sign2 .line{ border-bottom:1px solid #111; margin-top:26px; }
-  .ps-draft{ font-size:10px; color:var(--red); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+  .payslip{ width:100%; max-width:800px; background:#fff; box-shadow: var(--shadow); margin-bottom:20px; font-family: Arial, Helvetica, sans-serif; color:#111; padding:30px 36px 26px; }
+  .ps-header{ display:flex; align-items:flex-start; gap:16px; margin-bottom:16px; }
+  .ps-logo{ width:50px; height:50px; border-radius:50%; background:var(--ink); color:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:19px; flex-shrink:0; font-family:"Iowan Old Style","Georgia",serif; }
+  .ps-header-main{ flex:1; }
+  .ps-company{ font-size:21px; font-weight:800; letter-spacing:.3px; }
+  .ps-address{ font-size:11.5px; color:#444; margin-top:4px; line-height:1.55; max-width:480px; }
+  .ps-ssm{ font-size:11px; color:#333; text-align:right; white-space:nowrap; padding-top:6px; }
+  .ps-draft{ font-size:10px; color:var(--red); text-transform:uppercase; letter-spacing:1px; margin-top:4px; text-align:right; }
+
+  .ps-idbox{ border:1.5px solid #111; padding:10px 18px; display:flex; justify-content:space-between; margin-bottom:18px; font-size:12.5px; gap:20px; }
+  .ps-idbox .id-left div, .ps-idbox .id-right div{ padding:2px 0; }
+  .ps-idbox .id-right{ text-align:right; }
+
+  .ps-cols{ display:grid; grid-template-columns:1fr 1fr; gap:0 30px; }
+  .ps-col-head{ font-size:13px; font-weight:700; text-transform:uppercase; border-bottom:1.5px solid #111; padding-bottom:5px; margin-bottom:8px; letter-spacing:.5px; }
+  .ps-col-body{ min-height:90px; }
+  .ps-line{ display:flex; justify-content:space-between; font-size:12.5px; padding:4px 0; }
+  .ps-net-line{ border-top:1px solid #111; padding-top:7px; margin-top:14px; font-weight:700; }
+  .ps-cp38-line{ font-size:12.5px; padding:4px 0; color:#444; }
+
+  .ps-bottom{ border-top:1.5px solid #111; margin-top:18px; padding-top:8px; }
+  .ps-bottom-row{ display:grid; grid-template-columns:1fr 1fr; gap:0 30px; font-size:12.5px; padding:3px 0; }
+  .ps-bottom-row.strong{ font-weight:700; }
+  .ps-bottom-row .bl{ display:flex; justify-content:space-between; }
   .ps-edit-hint{ width:100%; max-width:800px; display:flex; justify-content:flex-end; margin:-10px 0 14px; }
   .ps-edit-hint button{ background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:8px 14px; border-radius:7px; font-size:12.5px; cursor:pointer; font-family:inherit; }
   .ps-edit-hint button:hover{ border-color:var(--gold); color:var(--gold-deep); }
@@ -195,26 +182,19 @@
   /* ---- 2-up A4 print layout ---- */
   @page{ size:A4; margin:9mm; }
   .print-page{ display:flex; flex-direction:column; gap:0; }
-  .payslip.compact{ font-size:.86em; margin-bottom:0; }
-  .payslip.compact .ps-topbox{ padding:8px 14px; }
-  .payslip.compact .ps-company{ font-size:14px; }
-  .payslip.compact .ps-period{ font-size:11px; }
-  .payslip.compact .ps-idbox2{ padding:6px 14px; font-size:10px; }
-  .payslip.compact .ps-id-col .lbl{ width:92px; }
-  .payslip.compact .ps-attend-row{ padding:6px 14px; font-size:10px; }
-  .payslip.compact .attend-line .lbl{ width:88px; }
-  .payslip.compact table.attend-table{ font-size:9.5px; }
-  .payslip.compact .ps-col-head{ padding:5px 14px; font-size:10px; }
-  .payslip.compact .ps-col-body{ padding:6px 14px; min-height:60px; }
+  .payslip.compact{ font-size:.86em; margin-bottom:0; padding:16px 20px; }
+  .payslip.compact .ps-header{ margin-bottom:8px; gap:10px; }
+  .payslip.compact .ps-logo{ width:36px; height:36px; font-size:14px; }
+  .payslip.compact .ps-company{ font-size:15px; }
+  .payslip.compact .ps-address{ font-size:9.5px; }
+  .payslip.compact .ps-ssm{ font-size:9px; }
+  .payslip.compact .ps-idbox{ padding:6px 12px; font-size:10px; margin-bottom:10px; }
+  .payslip.compact .ps-col-head{ font-size:10.5px; padding-bottom:3px; margin-bottom:5px; }
+  .payslip.compact .ps-col-body{ min-height:50px; }
   .payslip.compact .ps-line{ font-size:9.5px; padding:2px 0; }
-  .payslip.compact .ps-totals-cell{ padding:5px 14px; font-size:9.5px; }
-  .payslip.compact .ps-netpay-row .val-cell{ padding:5px 14px; font-size:11px; }
-  .payslip.compact .ps-bottom-row{ padding:8px 14px; }
-  .payslip.compact .ps-eyer-box{ padding:5px 12px; min-width:170px; }
-  .payslip.compact .ps-eyer-box .ps-line{ font-size:9px; }
-  .payslip.compact .ps-ytd-box{ font-size:9px; }
-  .payslip.compact .ps-sign2{ padding:8px 14px 6px; font-size:9px; gap:12px; }
-  .payslip.compact .ps-sign2 .line{ margin-top:12px; }
+  .payslip.compact .ps-net-line{ margin-top:8px; padding-top:4px; }
+  .payslip.compact .ps-bottom{ margin-top:10px; padding-top:5px; }
+  .payslip.compact .ps-bottom-row{ font-size:9.5px; padding:2px 0; }
   .copy-label{ text-align:center; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:#888; padding:4px 0; }
   .cut-line{ position:relative; text-align:center; margin:2mm 0; border-top:1px dashed #999; }
   .cut-line span{ position:absolute; top:-7px; left:50%; transform:translateX(-50%); background:#fff; padding:0 8px; font-size:8.5px; color:#999; letter-spacing:1px; }
@@ -238,12 +218,11 @@
     .app{ grid-template-columns:1fr; }
     .sidebar{ order:2; }
     .main{ padding:22px 14px 40px; }
-    .ps-cols, .ps-totals-row, .ps-netpay-row{ grid-template-columns:1fr; }
-    .ps-col.left, .ps-totals-cell.left, .ps-netpay-row .blank{ border-right:none; border-bottom:2px solid #111; }
-    .ps-idbox2{ grid-template-columns:1fr; }
-    .ps-attend-row{ flex-direction:column; align-items:flex-start; }
-    .ps-bottom-row{ flex-direction:column; }
-    .ps-sign2{ flex-direction:column; }
+    .ps-cols, .ps-bottom-row{ grid-template-columns:1fr; }
+    .ps-idbox{ flex-direction:column; }
+    .ps-idbox .id-right{ text-align:left; }
+    .ps-header{ flex-direction:column; }
+    .ps-ssm{ text-align:left; }
     .gate, .form-card{ padding:26px 20px; }
     .fc-grid2, .fc-grid3{ grid-template-columns:1fr; gap:16px; }
   }
@@ -331,7 +310,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbzm4QgGzlPSg1b0IpFdNepkftHpvXshDn-iw1-hydMm_HyvQZix-LkXUp59AdroY4_F/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbwE6JFx_MP22mfX5mFRr5zzL1wc_h_-vQJlwbVfboFJs-SuXEpe0HxVHyMe2oDLmgy4/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -355,6 +334,7 @@
       <div class="fc-sub">Company details appear on every payslip you generate.</div>
       <div class="fc-group"><label class="fc-label">Company name</label><input type="text" class="fc-input" id="companyName" placeholder="e.g. Demo Company Sdn Bhd"></div>
       <div class="fc-group"><label class="fc-label">Address</label><input type="text" class="fc-input" id="companyAddr" placeholder="Address, city, state"></div>
+      <div class="fc-group"><label class="fc-label">SSM registration no.</label><input type="text" class="fc-input" id="companySsm" placeholder="e.g. 002628025-K"></div>
       <div class="fc-group"><label class="fc-label">Employer EPF / SOCSO / EIS No.</label><input type="text" class="fc-input" id="companyRefs" placeholder="e.g. E12345678 / S987654"></div>
       <div class="fc-group" style="display:flex; align-items:center; gap:10px;">
         <input type="checkbox" id="companyHrdf" style="width:18px; height:18px; accent-color:#b8863c;">
@@ -438,16 +418,20 @@
         <div class="fc-group"><label class="fc-label">PCB / MTD tax (RM)</label><input type="number" class="fc-input" id="pcb" placeholder="0.00" step="0.01"></div>
         <div class="fc-group"><label class="fc-label">Other deduction (RM)</label><input type="number" class="fc-input" id="otherDeduct" placeholder="0.00" step="0.01"></div>
       </div>
+      <div class="fc-group"><label class="fc-label">CP38 instalment (RM)</label><input type="number" class="fc-input" id="cp38" placeholder="0.00" step="0.01"></div>
 
-      <div class="fc-section-title">YTD leave (for reference on payslip)</div>
-      <div class="fc-grid2">
-        <div class="fc-group"><label class="fc-label">YTD annual leave — days [balance]</label>
-          <div class="row2"><input type="number" class="fc-input" id="ytdAlDays" placeholder="2.50" step="0.01"><input type="number" class="fc-input" id="ytdAlBracket" placeholder="0.00" step="0.01"></div>
-        </div>
-        <div class="fc-group"><label class="fc-label">YTD medical leave — days [balance]</label>
-          <div class="row2"><input type="number" class="fc-input" id="ytdMcDays" placeholder="0.00" step="0.01"><input type="number" class="fc-input" id="ytdMcBracket" placeholder="14.00" step="0.01"></div>
-        </div>
+      <div class="fc-section-title">Leave record (for reference on payslip)</div>
+      <div class="fc-grid3">
+        <div class="fc-group"><label class="fc-label">Annual leave taken (days)</label><input type="number" class="fc-input" id="alTaken" placeholder="0" step="0.5"></div>
+        <div class="fc-group"><label class="fc-label">Annual leave balance</label><input type="number" class="fc-input" id="alBalance" placeholder="0" step="0.5"></div>
+        <div class="fc-group"><label class="fc-label">Annual leave YTD</label><input type="number" class="fc-input" id="alYtd" placeholder="0" step="0.5"></div>
       </div>
+      <div class="fc-grid3">
+        <div class="fc-group"><label class="fc-label">Medical leave taken (days)</label><input type="number" class="fc-input" id="mcTaken" placeholder="0" step="0.5"></div>
+        <div class="fc-group"><label class="fc-label">Medical leave balance</label><input type="number" class="fc-input" id="mcBalance" placeholder="0" step="0.5"></div>
+        <div class="fc-group"><label class="fc-label">Medical leave YTD</label><input type="number" class="fc-input" id="mcYtd" placeholder="0" step="0.5"></div>
+      </div>
+      <div class="fc-group"><label class="fc-label">Other leave (days)</label><input type="number" class="fc-input" id="otherLeave" placeholder="0" step="0.5"></div>
 
       <div class="fc-actions">
         <button class="fc-btn primary" id="savePayslipBtn">Save this month's payslip</button>
@@ -498,8 +482,8 @@
   const monthSel = document.getElementById('payMonth');
   MONTHS.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=titleCase(m); monthSel.appendChild(o); });
 
-  const PAY_FIELDS = ['basicSalary','workingDays','daysWorked','eoHours','latHours','tofHours','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','otherDeduct','ytdAlDays','ytdAlBracket','ytdMcDays','ytdMcBracket'];
-  const AMOUNT_FIELDS = ['basicSalary','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','otherDeduct'];
+  const PAY_FIELDS = ['basicSalary','workingDays','daysWorked','eoHours','latHours','tofHours','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct','alTaken','alBalance','alYtd','mcTaken','mcBalance','mcYtd','otherLeave'];
+  const AMOUNT_FIELDS = ['basicSalary','dailyAttendance','meal','nightShift','normalOT','restOT','commission','bonus','unpaidLeave','pcb','cp38','otherDeduct'];
   const LS_KEY = 'gaji_apps_script_url';
 
   let API_URL = null;
@@ -522,6 +506,7 @@
     clearTimeout(t._timer); t._timer = setTimeout(()=>t.classList.remove('show'), 2600);
   }
   const fmt = (n) => (isFinite(n)?n:0).toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const fmtInt = (n) => { const v = parseFloat(n); return isFinite(v) ? (Number.isInteger(v) ? v : v.toFixed(2)) : 0; };
   const esc = (s) => (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   function getSavedUrl(){ try{ return localStorage.getItem(LS_KEY); }catch(e){ return null; } }
@@ -642,6 +627,7 @@
     const bonus = parseFloat(pay.bonus)||0;
     const unpaidLeave = parseFloat(pay.unpaidLeave)||0;
     const pcb = parseFloat(pay.pcb)||0;
+    const cp38 = parseFloat(pay.cp38)||0;
     const otherDeduct = parseFloat(pay.otherDeduct)||0;
 
     const statutoryWage = Math.max(basic + meal + nightShift + commission - unpaidLeave, 0);
@@ -693,7 +679,7 @@
       unpaidLeave ? ['UNPAID LEAVE', unpaidLeave] : null,
       otherDeduct ? ['OTHER DEDUCTION', otherDeduct] : null,
     ].filter(Boolean);
-    const totalDeductions = deductions.reduce((s,r)=>s+r[1],0);
+    const totalDeductions = deductions.reduce((s,r)=>s+r[1],0) + cp38;
 
     const netSalary = totalEarnings - totalDeductions;
     const hrdfRegistered = company.hrdfRegistered === 'yes' || company.hrdfRegistered === true;
@@ -701,80 +687,71 @@
     const employerCost = totalEarnings + epfEmployer + socsoEmployer + eisEmployer + hrdfLevy;
 
     return { earnings, deductions, totalEarnings, totalDeductions, netSalary, epfEmployer, socsoEmployer, eisEmployer, hrdfLevy, employerCost,
-      epfEmployee, socsoEmployee, eisEmployee, pcb, lindungAmount,
+      epfEmployee, socsoEmployee, eisEmployee, pcb, cp38, lindungAmount,
       baseRate, workingDays, daysWorked, eoHours, latHours, tofHours, isProrated,
-      ytdAlDays: pay.ytdAlDays, ytdAlBracket: pay.ytdAlBracket, ytdMcDays: pay.ytdMcDays, ytdMcBracket: pay.ytdMcBracket };
+      alTaken: pay.alTaken, alBalance: pay.alBalance, alYtd: pay.alYtd,
+      mcTaken: pay.mcTaken, mcBalance: pay.mcBalance, mcYtd: pay.mcYtd, otherLeave: pay.otherLeave };
   }
 
   function buildPayslipHTML(company, profile, period, calc, opts){
     opts = opts || {};
-    const refs = (company.companyRefs||'').trim();
-    const fmtDays = (n) => (parseFloat(n)||0).toFixed(2);
+    const initial = (company.companyName||'?').trim().charAt(0).toUpperCase() || '?';
+    const addrLine = (company.companyAddr||'').trim();
+    const ssmLine = (company.ssmNo||'').trim();
+    const printedDate = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric'}).replace(/\//g,'-');
+
     return `
-      <div class="ps-topbox">
-        <div class="ps-company">${esc(company.companyName)||'Company Name'}</div>
+      <div class="ps-header">
+        <div class="ps-logo">${esc(initial)}</div>
+        <div class="ps-header-main">
+          <div class="ps-company">${esc(company.companyName)||'Company Name'}</div>
+          ${addrLine ? `<div class="ps-address">${esc(addrLine)}</div>` : ''}
+        </div>
         <div>
-          <div class="ps-period">END PAYMENT&nbsp;&nbsp;-&nbsp;&nbsp;${MONTHS[period.month]} ${period.year}</div>
+          ${ssmLine ? `<div class="ps-ssm">SSM No : ${esc(ssmLine)}</div>` : ''}
           ${opts.dirty ? '<div class="ps-draft">Unsaved changes</div>' : ''}
         </div>
       </div>
-      <div class="ps-idbox2">
-        <div class="ps-id-col">
-          <div><span class="lbl">EMPLOYEE NO.</span>${esc(profile.empNo)||'—'}</div>
-          <div><span class="lbl">NAME</span>${esc(profile.empName)||'—'}</div>
-          <div><span class="lbl">IC NO.</span>${esc(profile.empIC)||'—'}</div>
-          <div><span class="lbl">DEPARTMENT</span>${esc(profile.empDept)||'—'}</div>
+      <div class="ps-idbox">
+        <div class="id-left">
+          <div>NAME : ${esc(profile.empName)||'—'}</div>
+          <div>STAFF NO : ${esc(profile.empNo)||'—'}</div>
+          <div>NRIC No. : ${esc(profile.empIC)||'—'}</div>
         </div>
-        <div class="ps-id-col">
-          <div><span class="lbl">POSITION</span>${esc(profile.empPosition)||'—'}</div>
-          <div><span class="lbl">EPF NO.</span>${esc(profile.empEpfNo)||'—'}</div>
-          <div><span class="lbl">SOCSO NO.</span>${esc(profile.empSocsoNo)||'—'}</div>
-          <div><span class="lbl">TAX NO.</span>${esc(profile.empTaxNo)||'—'}</div>
+        <div class="id-right">
+          <div>${printedDate}</div>
+          <div>Payslip Month : ${titleCase(MONTHS[period.month])}, ${period.year}</div>
         </div>
-      </div>
-      <div class="ps-attend-row">
-        <div class="attend-left">
-          <div class="attend-line"><span class="lbl">BASE RATE</span><span>${fmt(calc.baseRate)}</span></div>
-          <div class="attend-line"><span class="lbl">WORKING DAYS</span><span>${fmtDays(calc.workingDays)}</span></div>
-        </div>
-        <table class="attend-table">
-          <tr><th>DW</th><th>EO</th><th>LAT</th><th>TOF</th></tr>
-          <tr><td>${fmtDays(calc.daysWorked)}</td><td>${fmtDays(calc.eoHours)}</td><td>${fmtDays(calc.latHours)}</td><td>${fmtDays(calc.tofHours)}</td></tr>
-        </table>
       </div>
       <div class="ps-cols">
-        <div class="ps-col left">
-          <div class="ps-col-head">Earnings / Income</div>
-          <div class="ps-col-body">${calc.earnings.map(r=>`<div class="ps-line"><span class="l">${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('')}</div>
+        <div class="ps-col">
+          <div class="ps-col-head">Income</div>
+          <div class="ps-col-body">${calc.earnings.map(r=>`<div class="ps-line"><span>${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('')}</div>
         </div>
         <div class="ps-col">
           <div class="ps-col-head">Deduction</div>
-          <div class="ps-col-body">${calc.deductions.map(r=>`<div class="ps-line"><span class="l">${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('')}</div>
+          <div class="ps-col-body">
+            ${calc.deductions.map(r=>`<div class="ps-line"><span>${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('')}
+            <div class="ps-line ps-net-line"><span>Net Income</span><span>${fmt(calc.netSalary)}</span></div>
+            <div class="ps-cp38-line"><span>CP38</span><span style="float:right;">${calc.cp38 ? fmt(calc.cp38) : ''}</span></div>
+          </div>
         </div>
       </div>
-      <div class="ps-totals-row">
-        <div class="ps-totals-cell left"><span>GROSS PAY</span><span>${fmt(calc.totalEarnings)}</span></div>
-        <div class="ps-totals-cell"><span>TOTAL DEDUCTION</span><span>${fmt(calc.totalDeductions)}</span></div>
-      </div>
-      <div class="ps-netpay-row">
-        <div class="blank"></div>
-        <div class="val-cell"><span>NET PAY</span><span>${fmt(calc.netSalary)}</span></div>
-      </div>
-      <div class="ps-bottom-row">
-        <div class="ps-eyer-box">
-          <div class="ps-line"><span class="l">EPF (E'YER)</span><span>${fmt(calc.epfEmployer)}</span></div>
-          <div class="ps-line"><span class="l">SOCSO (E'YER)</span><span>${fmt(calc.socsoEmployer)}</span></div>
-          <div class="ps-line"><span class="l">EIS (E'YER)</span><span>${fmt(calc.eisEmployer)}</span></div>
-          ${calc.hrdfLevy ? `<div class="ps-line"><span class="l">HRDF (E'YER)</span><span>${fmt(calc.hrdfLevy)}</span></div>` : ''}
+      <div class="ps-bottom">
+        <div class="ps-bottom-row strong">
+          <div class="bl"><span>Gross Income</span><span>${fmt(calc.totalEarnings)}</span></div>
+          <div class="bl"><span>End Month Pay</span><span>${fmt(calc.netSalary)}</span></div>
         </div>
-        <div class="ps-ytd-box">
-          <div class="ps-line"><span class="l">YTD AL</span><span>${fmtDays(calc.ytdAlDays)} DAYS&nbsp;&nbsp;[ ${fmtDays(calc.ytdAlBracket)}]</span></div>
-          <div class="ps-line"><span class="l">YTD MC</span><span>${fmtDays(calc.ytdMcDays)} DAYS&nbsp;&nbsp;[ ${fmtDays(calc.ytdMcBracket)}]</span></div>
+        <div class="ps-bottom-row">
+          <div class="bl"><span>Employer EPF</span><span>${fmt(calc.epfEmployer)}</span></div>
+          <div>Annual Leave = ${fmtInt(calc.alTaken)} ,Balance = ${fmtInt(calc.alBalance)}, YTD = ${fmtInt(calc.alYtd)}</div>
         </div>
-      </div>
-      <div class="ps-sign2">
-        <div>APPROVED BY :<div class="line"></div></div>
-        <div>RECEIVED BY :<div class="line"></div></div>
+        <div class="ps-bottom-row">
+          <div class="bl"><span>Employer SOCSO</span><span>${fmt(calc.socsoEmployer)}</span></div>
+          <div>Medical Leave = ${fmtInt(calc.mcTaken)}, Balance = ${fmtInt(calc.mcBalance)}, YTD = ${fmtInt(calc.mcYtd)}${calc.otherLeave ? `&nbsp;&nbsp;&nbsp;Other Leave = ${fmtInt(calc.otherLeave)}` : ''}</div>
+        </div>
+        ${calc.eisEmployer ? `<div class="ps-bottom-row"><div class="bl"><span>Employer EIS</span><span>${fmt(calc.eisEmployer)}</span></div><div></div></div>` : ''}
+        ${calc.hrdfLevy ? `<div class="ps-bottom-row"><div class="bl"><span>HRDF (E'yer)</span><span>${fmt(calc.hrdfLevy)}</span></div><div></div></div>` : ''}
       </div>
     `;
   }
@@ -838,6 +815,7 @@
     document.getElementById('companyFormTitle').textContent = 'Add company';
     document.getElementById('companyName').value='';
     document.getElementById('companyAddr').value='';
+    document.getElementById('companySsm').value='';
     document.getElementById('companyRefs').value='';
     document.getElementById('companyHrdf').checked=false;
     document.getElementById('deleteCompanyBtn').style.display='none';
@@ -851,6 +829,7 @@
     document.getElementById('companyFormTitle').textContent = 'Edit company';
     document.getElementById('companyName').value = co.companyName||'';
     document.getElementById('companyAddr').value = co.companyAddr||'';
+    document.getElementById('companySsm').value = co.ssmNo||'';
     document.getElementById('companyRefs').value = co.companyRefs||'';
     document.getElementById('companyHrdf').checked = co.hrdfRegistered === 'yes';
     document.getElementById('deleteCompanyBtn').style.display='inline-flex';
@@ -862,6 +841,7 @@
     const data = {
       companyName: document.getElementById('companyName').value.trim(),
       companyAddr: document.getElementById('companyAddr').value.trim(),
+      ssmNo: document.getElementById('companySsm').value.trim(),
       companyRefs: document.getElementById('companyRefs').value.trim(),
       hrdfRegistered: document.getElementById('companyHrdf').checked ? 'yes' : '',
     };
