@@ -369,7 +369,7 @@
         <li>Copy the Web App URL it gives you and paste it below.</li>
       </ol>
       <div class="gate-input-row">
-        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbw4jK6l1CviXGWF4Kr84HjvL-8y89W2fjEzH5G5826IF8TMj53iTXRdh6fIrKOrvNEw/exec">
+        <input type="url" id="gateUrlInput" placeholder="https://script.google.com/macros/s/AKfycbw4uXBvc91xCdUX28vocg7dR2ly3SoqayAGXZWlvPi7BRUdtQVsRM4lIVz5LlApFk4T/exec">
         <button class="gate-connect-btn" id="gateConnectBtn">Connect</button>
       </div>
       <div class="gate-error" id="gateError"></div>
@@ -1214,20 +1214,39 @@
     showView('payslip');
   }
 
+  async function promptCopyFromLastMonthIfBlank(pay, staffId, year, month, variant, staffName){
+    const hasAny = pay && AMOUNT_FIELDS.some(k=>parseFloat(pay[k])>0);
+    if (hasAny) return { pay, copied:false };
+    let py = month - 1, yy = year;
+    if (py < 0){ py = 11; yy -= 1; }
+    let prev;
+    try{ prev = await dbGetPayslip(currentCompanyId, staffId, yy, py, variant); }catch(e){ prev = null; }
+    const hasPrev = prev && AMOUNT_FIELDS.some(k=>parseFloat(prev[k])>0);
+    if (!hasPrev) return { pay, copied:false };
+    const ok = confirm(`No Payslip ${variant} saved yet for ${staffName || 'this staff'} — ${titleCase(MONTHS[month])} ${year}.\n\nCopy figures from ${titleCase(MONTHS[py])} ${yy}?`);
+    if (!ok) return { pay, copied:false };
+    return { pay: JSON.parse(JSON.stringify(prev)), copied:true };
+  }
+
   async function loadPeriod(){
     if (!currentStaffId) return;
     currentYear = parseInt(document.getElementById('payYear').value)||new Date().getFullYear();
     currentMonth = parseInt(monthSel.value);
     currentVariant = 'A';
     setVariantTabsUI();
+    const staff = staffList.find(s=>s.id===currentStaffId);
+    let copied = false;
     try{
-      const pay = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth);
+      let pay = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth);
+      const result = await promptCopyFromLastMonthIfBlank(pay, currentStaffId, currentYear, currentMonth, 'A', staff ? staff.empName : '');
+      pay = result.pay; copied = result.copied;
       fillPayForm(pay);
       applyAttendanceDefaultsIfBlank();
     }catch(e){ toast('Could not load payslip: ' + e.message, true); fillPayForm(null); applyAttendanceDefaultsIfBlank(); }
-    isDirty = false;
+    isDirty = copied;
     await renderHistoryChips();
     renderPayslip();
+    if (copied) toast(`Copied last month's figures — remember to save`);
   }
 
   async function renderHistoryChips(){
@@ -1381,11 +1400,18 @@
     currentVariant = variant;
     setVariantTabsUI();
     let pay = null;
-    try{ pay = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, variant); }
+    let copied = false;
+    try{
+      pay = await dbGetPayslip(currentCompanyId, currentStaffId, currentYear, currentMonth, variant);
+      const staff = staffList.find(s=>s.id===currentStaffId);
+      const result = await promptCopyFromLastMonthIfBlank(pay, currentStaffId, currentYear, currentMonth, variant, staff ? staff.empName : '');
+      pay = result.pay; copied = result.copied;
+    }
     catch(e){ toast('Could not load Payslip ' + variant + ': ' + e.message, true); }
     fillPayForm(pay);
     applyAttendanceDefaultsIfBlank();
-    isDirty = false;
+    isDirty = copied;
+    if (copied) toast(`Copied last month's Payslip ${variant} figures — remember to save`);
   }
   document.querySelectorAll('.variant-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> switchVariant(btn.dataset.variant));
